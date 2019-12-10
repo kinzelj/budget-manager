@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, '/client/build')));
 
 const port = process.env.PORT || 5000;
 
-app.get('/data', function (req, res) {
+app.post('/data', function (req, res) {
 	const csvFilePath='./data/2019.csv'
 	csv().fromFile(csvFilePath).then((jsonObj)=>{
 		res.send(JSON.stringify(jsonObj));

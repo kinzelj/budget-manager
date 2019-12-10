@@ -4,3 +4,5 @@
 
 # production
 /client/build
+
+.env
