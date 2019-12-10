@@ -39,7 +39,7 @@ const styles = theme => ({
 class MuiVirtualizedTable extends React.PureComponent {
   static defaultProps = {
     headerHeight: 48,
-    rowHeight: 48,
+    rowHeight: 38,
   };
 
   getRowClassName = ({ index }) => {
@@ -150,12 +150,12 @@ export default class DataTable extends Component {
     this.setState({
       tableHeaders: this.props.headers,
       tableData: this.props.data
-    }, () => console.log(this.state));
+    });
   }
 
   render() {
     return (
-      <Paper style={{ height: 400, width: '100%' }}>
+      <Paper style={{ height: 400, width: '100%', minWidth: '600px' }}>
         <VirtualizedTable
           rowCount={this.state.tableData.length}
           rowGetter={({ index }) => this.state.tableData[index]}
