@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { withStyles } from '@material-ui/core/styles';
@@ -141,28 +141,14 @@ MuiVirtualizedTable.propTypes = {
 
 const VirtualizedTable = withStyles(styles)(MuiVirtualizedTable);
 
-export default class DataTable extends Component {
-  state = {
-    tableHeaders: [{width: 150, label: "", dataKey: "default", numeric: false}],
-    tableData: [""]
-  }
-  componentDidMount() {
-    console.log(this.props);
-    this.setState({
-      tableHeaders: this.props.headers,
-      tableData: this.props.data
-    });
-  }
-
-  render() {
+export default function DataTable(props) {
     return (
       <Paper style={{ height: 400, width: '100%', minWidth: '600px' }}>
         <VirtualizedTable
-          rowCount={this.state.tableData.length}
-          rowGetter={({ index }) => this.state.tableData[index]}
-          columns={this.state.tableHeaders}
+          rowCount={props.data.length}
+          rowGetter={({ index }) => props.data[index]}
+          columns={props.headers}
         />
       </Paper>
     );
-  }
 }

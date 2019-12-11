@@ -10,7 +10,49 @@ class App extends Component {
     data: {},
     tableData: {},
     tableHeaders: [],
-    dateRange: []
+    dateRange: [],
+  }
+
+	setTableData = (data, dateRange) => {
+    var filteredData = data.filter((entry) => {
+      const checkDate = entry["Transaction Date"];
+    	const minTimeCorrection = 24 * 3600000;
+      if ((checkDate.getTime() + minTimeCorrection) <= dateRange[0] 
+          || (checkDate.getTime())  > dateRange[1]) {
+        return false
+      }
+      else return true
+    })
+    
+    const getTextDate = (date) => {
+      const monthNum = Number(date.getUTCMonth()) + 1
+      var monthText = monthNum.toString();
+      if (monthNum < 10) {
+        monthText = "0" + monthText;
+      }
+
+      const dayNum = Number(date.getUTCDate());
+      var dayText = dayNum.toString();
+      if (dayNum < 10) {
+        dayText = "0" + dayText;
+      }
+
+      const textDate =  monthText + "-" + dayText + '-' + date.getUTCFullYear();
+      return textDate;
+    }
+    
+    const tableData = filteredData.map((entry) => {
+      return {
+            "Card No.": entry["Card No."],
+            Category: entry["Category"],
+            Credit: Number(entry["Credit"]),
+            Debit: Number(entry["Debit"]),
+            Description: entry["Description"],
+            "Posted Date": getTextDate(entry["Posted Date"]),
+            "Transaction Date": getTextDate(entry["Transaction Date"])
+          }
+    })
+    return tableData;
   }
 
   handleSubmitData = (event, dataFile) => {
@@ -44,24 +86,61 @@ class App extends Component {
           return returnObject;
         })
 
+      	const parseDate = (dateString) => {
+          var year = '';
+          var month = '';
+          var day = '';
+          
+          //get month
+          var index = 0;
+          var checkChar = dateString[index];
+          while (checkChar !== '/') {
+           month += checkChar;
+            index += 1;
+            checkChar = dateString[index];
+          }
+          month = Number(month);
+          
+          //get day
+          index += 1;
+          checkChar = dateString[index];
+          while (checkChar !== '/'){
+            day += checkChar;
+            index += 1; 
+            checkChar = dateString[index];
+          }
+          day = Number(day);
+          
+          //get year
+          index += 1;
+    			year = Number(dateString.slice(index,index+4));
+          
+          //set return object
+          const returnObj = {
+            year: year,
+            month: month,
+            day: day 
+          }
+          return returnObj;
+        }
 
         const formattedData = res.data.map((entry, index) => {
+          const postedDateObj = parseDate(entry["Posted Date"]);
+          const transactionDateObj = parseDate(entry["Transaction Date"]);
           return {
-            Entry: index,
             "Card No.": entry["Card No."],
             Category: entry["Category"],
             Credit: Number(entry["Credit"]),
             Debit: Number(entry["Debit"]),
             Description: entry["Description"],
-            "Posted Date": new Date(entry["Posted Date"]),
-            "Transaction Date": new Date(entry["Transaction Date"])
+            "Posted Date": new Date(Date.UTC(postedDateObj.year, (postedDateObj.month - 1), postedDateObj.day)),
+            "Transaction Date": new Date(Date.UTC(transactionDateObj.year, (transactionDateObj.month - 1), transactionDateObj.day)),
           }
         });
-
+      
         //set min and max dates
         var minDate = new Date();
         var maxDate = new Date();
-        console.log(formattedData);
         formattedData.map((entry, index) => {
           if (index === 0) {
             minDate = entry["Transaction Date"];
@@ -75,27 +154,20 @@ class App extends Component {
         this.setState({
           dateRange: [minDate, maxDate],
           renderData: true,
-          tableData: res.data,
+          tableData: this.setTableData(formattedData, [minDate, maxDate]),
           data: formattedData,
           tableHeaders: headersObject
-        }, () => { console.log(this.state) });
+        });
       })
       .catch(err => console.log(err));
 
   }
 
   handleDateUpdate = (dateRange) => {
-    this.setState({ renderData: false });
-    var filteredData = this.state.tableData.filter((entry) => {
-      if (new Date(entry["Transaction Date"]).getTime() < dateRange.value[0] || new Date(entry["Transaction Date"]).getTime() > dateRange.value[1]) {
-        return false
-      }
-      else return true
-    })
     this.setState({
       renderData: true,
-      tableData: filteredData,
-    }, () => console.log(this.state));
+      tableData: this.setTableData(this.state.data, dateRange.value),
+    });
   }
 
   render() {
@@ -103,9 +175,9 @@ class App extends Component {
       renderData,
       tableData,
       tableHeaders,
-      dateRange
+      dateRange,
     } = this.state
-
+    
     if (renderData) {
       return (
         <div className="App">
