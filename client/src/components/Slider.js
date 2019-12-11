@@ -75,22 +75,22 @@ export default function RangeSlider(props) {
   };
   
   const handleMinInputChange = (event) => {
-    const newYear = Number(event.target.value.slice(0,4));
-    const newMonth = Number(event.target.value.slice(5,7));
-    const newDay = Number(event.target.value.slice(8,10));
-    const newMin = new Date();
-    newMin.setUTCFullYear(newYear, (newMonth - 1), newDay);
-    const newValue = [newMin.getTime(), value[1]];
-    setValue(newValue);
+      const newYear = Number(event.target.value.slice(0,4));
+      const newMonth = Number(event.target.value.slice(5,7));
+      const newDay = Number(event.target.value.slice(8,10));
+      const newMin = new Date();
+      newMin.setUTCFullYear(newYear, (newMonth - 1), newDay);
+      const newValue = [newMin.getTime(), value[1]];
+      setValue(newValue);
   };
   const handleMaxInputChange = (event) => {
-    const newYear = Number(event.target.value.slice(0,4));
-    const newMonth = Number(event.target.value.slice(5,7));
-    const newDay = Number(event.target.value.slice(8,10));
-    const newMax = new Date();
-    newMax.setUTCFullYear(newYear, (newMonth - 1), newDay);
-    const newValue = [value[0], newMax.getTime()];
-    setValue(newValue);
+      const newYear = Number(event.target.value.slice(0,4));
+      const newMonth = Number(event.target.value.slice(5,7));
+      const newDay = Number(event.target.value.slice(8,10));
+      const newMax = new Date();
+      newMax.setUTCFullYear(newYear, (newMonth - 1), newDay);
+      const newValue = [value[0], newMax.getTime()];
+      setValue(newValue);
   };
   
   const handleUpdate = (event) => {

@@ -180,15 +180,17 @@ class App extends Component {
     
     if (renderData) {
       return (
-        <div className="App">
-          <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
-          <DataTable data={tableData} headers={tableHeaders} />
+        <div className="app" style={{width: '90%', margin: 'auto'}}>
+        	<div className='table-slider' style={{maxWidth: '930px', margin: 'auto'}}>
+            <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
+            <DataTable data={tableData} headers={tableHeaders} />
+        	</div>
         </div>
       );
     }
     else {
       return (
-        <div className="App">
+        <div className="App" style={{width: '90%', margin: 'auto'}}>
           <FileUpload submitFile={this.handleSubmitData} />
         </div>
       );
