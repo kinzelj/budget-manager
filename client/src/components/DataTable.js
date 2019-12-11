@@ -147,6 +147,7 @@ export default class DataTable extends Component {
     tableData: [""]
   }
   componentDidMount() {
+    console.log(this.props);
     this.setState({
       tableHeaders: this.props.headers,
       tableData: this.props.data

@@ -16,24 +16,18 @@ class App extends Component {
   handleSubmitData = (event, dataFile) => {
 
     //async function to send data file to server and return as JSON object
-    const sendData = async (dataObject) => {
-      const options = {
-        method: 'POST',
-        url: '/data',
-        data: dataObject
-      }
-      const response = await axios(options);
-      const responseData = await response.data;
-      return responseData;
-    }
+    var dataFileToSend = new FormData();
+    dataFileToSend.append('file', dataFile);
 
-    const data = new FormData()
-    data.append('file', dataFile)
-
-    sendData(data)
+    axios.post("/data", dataFileToSend, {})
       .then(res => {
-        var headers = Object.keys(res[0]);
-      	headers = headers.filter((value) => { if(value !== "Card No." && value !== "Posted Date"){return true}});
+        var headers = Object.keys(res.data[0]);
+        headers = headers.filter((value) => {
+          if (value !== "Card No." && value !== "Posted Date") {
+            return true
+          }
+          return false;
+        });
         const headersObject = headers.map((value, index) => {
           var returnObject = {
             width: 150,
@@ -49,54 +43,74 @@ class App extends Component {
           }
           return returnObject;
         })
-        
-      
-      	const formatedData = res.map((entry, index) => {
+
+
+        const formattedData = res.data.map((entry, index) => {
           return {
-            "Entry": index,
-          	"Card No.": entry["Card No."],
-      			Category: entry["Category"],
-      			Credit: Number(entry["Credit"]),
-      			Debit: Number(entry["Debit"]),
-      			Description: entry["Description"],
-      			"Posted Date": new Date(entry["Posted Date"]),
-      			"Transaction Date": new Date(entry["Transaction Date"])
+            Entry: index,
+            "Card No.": entry["Card No."],
+            Category: entry["Category"],
+            Credit: Number(entry["Credit"]),
+            Debit: Number(entry["Debit"]),
+            Description: entry["Description"],
+            "Posted Date": new Date(entry["Posted Date"]),
+            "Transaction Date": new Date(entry["Transaction Date"])
           }
         });
-      
+
+        //set min and max dates
         var minDate = new Date();
         var maxDate = new Date();
-      	const getDateRange = formatedData.map((entry, index) => {
-        	if (index === 0) {
+        console.log(formattedData);
+        formattedData.map((entry, index) => {
+          if (index === 0) {
             minDate = entry["Transaction Date"];
             maxDate = entry["Transaction Date"];
-          } 
-          else if (entry["Transaction Date"] < minDate) {minDate = entry["Transaction Date"]}
-          else if (entry["Transaction Date"] > maxDate) {maxDate = entry["Transaction Date"]}
+          }
+          else if (entry["Transaction Date"] < minDate) { minDate = entry["Transaction Date"] }
+          else if (entry["Transaction Date"] > maxDate) { maxDate = entry["Transaction Date"] }
+          return null;
         })
-        
-        this.setState({ 
-          dateRange: [minDate, maxDate], 
-          renderData: true, 
-          tableData: res, 
-          data: formatedData, 
-          tableHeaders: headersObject 
-        }, () => {console.log(this.state)});
+
+        this.setState({
+          dateRange: [minDate, maxDate],
+          renderData: true,
+          tableData: res.data,
+          data: formattedData,
+          tableHeaders: headersObject
+        }, () => { console.log(this.state) });
       })
       .catch(err => console.log(err));
 
   }
-  
+
   handleDateUpdate = (dateRange) => {
-    console.log(dateRange);
+    this.setState({ renderData: false });
+    var filteredData = this.state.tableData.filter((entry) => {
+      if (new Date(entry["Transaction Date"]).getTime() < dateRange.value[0] || new Date(entry["Transaction Date"]).getTime() > dateRange.value[1]) {
+        return false
+      }
+      else return true
+    })
+    this.setState({
+      renderData: true,
+      tableData: filteredData,
+    }, () => console.log(this.state));
   }
 
   render() {
-    if (this.state.renderData === true) {
+    const {
+      renderData,
+      tableData,
+      tableHeaders,
+      dateRange
+    } = this.state
+
+    if (renderData) {
       return (
         <div className="App">
-        	<Slider handleUpdate={this.handleDateUpdate} dateRange={this.state.dateRange} />
-          <DataTable data={this.state.tableData} headers={this.state.tableHeaders} />
+          <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
+          <DataTable data={tableData} headers={tableHeaders} />
         </div>
       );
     }

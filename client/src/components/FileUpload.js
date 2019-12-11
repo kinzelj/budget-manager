@@ -5,8 +5,6 @@ class FileUpload extends Component {
     selectedFile: null
   };
 
-  
-
   handleChangeFile = (event) => {
     this.setState({
       selectedFile: event.target.files[0],

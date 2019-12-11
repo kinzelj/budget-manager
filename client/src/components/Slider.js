@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import Button from '@material-ui/core/Button';
-import Input from '@material-ui/core/Input';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 
@@ -95,7 +94,6 @@ export default function RangeSlider(props) {
   };
   
   const handleUpdate = (event) => {
-   console.log({value})
    props.handleUpdate({value}); 
   }
   
