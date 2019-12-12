@@ -143,7 +143,7 @@ const VirtualizedTable = withStyles(styles)(MuiVirtualizedTable);
 
 export default function DataTable(props) {
     return (
-      <Paper style={{ height: 400, width: '100%', minWidth: '650px' }}>
+      <Paper style={{ height: 700, width: '100%', minWidth: '650px' }}>
         <VirtualizedTable
           rowCount={props.data.length}
           rowGetter={({ index }) => props.data[index]}
