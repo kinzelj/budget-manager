@@ -132,10 +132,11 @@ class App extends Component {
         const formattedData = this.formatData(res, true);
         const tableData = this.setTableData(formattedData, this.getMinMaxDate(formattedData));
         const headersObject = this.getHeaders(res);
+      	const dateRange = this.getMinMaxDate(formattedData);
         this.setState({
           data: formattedData,
           tableData: tableData,
-          dateRange: this.getMinMaxDate(formattedData),
+          dateRange: dateRange,
           tableHeaders: headersObject
         });
       })

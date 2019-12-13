@@ -68,8 +68,14 @@ export default function RangeSlider(props) {
     return textDate;
   }
   
-  const [value, setValue] = React.useState([getMin(), getMax()]);
-
+  const [value, setValue] = React.useState([props.dateRange[0].getTime(),props.dateRange[1].getTime()]);
+  
+  const getDatesCallback = React.useCallback(() => {
+    setValue([ props.dateRange[0].getTime(), props.dateRange[1].getTime()]);
+  }, [setValue, props]);
+  
+  React.useEffect(() => { getDatesCallback() }, [getDatesCallback]);
+  
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -103,7 +109,7 @@ export default function RangeSlider(props) {
         Date Range
       </Typography>
     
-    <Grid container spacing={2} alignItems="center">
+    	<Grid container spacing={2} alignItems="center">
         <Grid item xs>
           <Slider
           value={value}
