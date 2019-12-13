@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import DataTable from './DataTable.js'
 import FileUpload from './FileUpload.js'
 import Slider from './Slider.js'
-import axios from 'axios';
+import Button from '@material-ui/core/Button';
+import * as ServerRoutes from '../routes/ServerRoutes.js'
 
 class App extends Component {
   state = {
     renderData: false,
+    importData: false,
     data: {},
     tableData: {},
     tableHeaders: [],
@@ -14,16 +16,6 @@ class App extends Component {
   }
 
   setTableData = (data, dateRange) => {
-    var filteredData = data.filter((entry) => {
-      const checkDate = entry["Transaction Date"];
-      const minTimeCorrection = 24 * 3600000;
-      if ((checkDate.getTime() + minTimeCorrection) <= dateRange[0]
-        || (checkDate.getTime()) > dateRange[1]) {
-        return false
-      }
-      else return true
-    })
-
     const getTextDate = (date) => {
       const monthNum = Number(date.getUTCMonth()) + 1
       var monthText = monthNum.toString();
@@ -40,18 +32,28 @@ class App extends Component {
       const textDate = monthText + "-" + dayText + '-' + date.getUTCFullYear();
       return textDate;
     }
+    
+    var filteredData = data.filter((entry) => {
+      const checkDate = entry["Transaction Date"];
+      const minTimeCorrection = 24 * 3600000;
+      if ((checkDate.getTime() + minTimeCorrection) <= dateRange[0]
+        || (checkDate.getTime()) > dateRange[1]) {
+        return false
+      }
+      else return true
+    })
 
     const tableData = filteredData.map((entry) => {
       return {
-        "Card No.": entry["Card No."],
-        Category: entry["Category"],
-        Credit: Number(entry["Credit"]),
-        Debit: Number(entry["Debit"]),
-        Description: entry["Description"],
-        "Posted Date": getTextDate(entry["Posted Date"]),
+        Category: entry.Category,
+        Credit: Number(entry.Credit),
+        Debit: Number(entry.Debit),
+        Description: entry.Description,
+        "Post Date": getTextDate(entry["Post Date"]),
         "Transaction Date": getTextDate(entry["Transaction Date"])
       }
     })
+    console.log(tableData);
     return tableData;
   }
 
@@ -59,15 +61,20 @@ class App extends Component {
   handleGetData = async (event, dataFile) => {
     var dataFileToSend = new FormData();
     dataFileToSend.append('file', dataFile);
-
-    const res = await axios.post("/data", dataFileToSend, {})
+    
+    var res = {};
+    try { res = await ServerRoutes.convertData(dataFileToSend) }
+    catch(err) { alert("Unable to import data -->" + err) }
+    
     var headers = Object.keys(res.data[0]);
+    
     headers = headers.filter((value) => {
       if (value !== "Card No." && value !== "Posted Date") {
         return true
       }
       return false;
     });
+
     const headersObject = headers.map((value, index) => {
       var returnObject = {
         width: 150,
@@ -126,12 +133,11 @@ class App extends Component {
       const postedDateObj = parseDate(entry["Posted Date"]);
       const transactionDateObj = parseDate(entry["Transaction Date"]);
       return {
-        "Card No.": entry["Card No."],
-        Category: entry["Category"],
-        Credit: Number(entry["Credit"]),
-        Debit: Number(entry["Debit"]),
-        Description: entry["Description"],
-        "Posted Date": new Date(Date.UTC(postedDateObj.year, (postedDateObj.month - 1), postedDateObj.day)),
+        Category: entry.Category,
+        Credit: Number(entry.Credit),
+        Debit: Number(entry.Debit),
+        Description: entry.Description,
+        "Post Date": new Date(Date.UTC(postedDateObj.year, (postedDateObj.month - 1), postedDateObj.day)),
         "Transaction Date": new Date(Date.UTC(transactionDateObj.year, (transactionDateObj.month - 1), transactionDateObj.day)),
       }
     });
@@ -165,23 +171,41 @@ class App extends Component {
       tableData: this.setTableData(this.state.data, dateRange.value),
     });
   }
+  
+  handleImport = async (event) => {
+    var res = {};
+    try { res = await ServerRoutes.importData(this.state.data) }
+    catch(err) { alert("Unable to import data -->" + err) }
+    
+    console.log(res);
+  }
 
   render() {
     const {
       renderData,
+      importData,
       tableData,
       tableHeaders,
       dateRange,
     } = this.state
 
+    console.log({tableData});
     if (renderData) {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
             <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
             <DataTable data={tableData} headers={tableHeaders} />
+            	<Button onClick={this.handleImport} variant="contained" color="primary" style={{marginTop: '10px'}}>
+        				Import Data
+        			</Button>
           </div>
         </div>
+      );
+    }
+    else if (importData) {
+      return (
+     		<div></div> 
       );
     }
     else {

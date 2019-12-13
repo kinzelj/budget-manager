@@ -6,3 +6,4 @@
 /client/build
 
 .env
+/client/.env.development.local
