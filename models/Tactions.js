@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const tSchema = new Schema({
-  category: String,
-  description: String,
-  tDate: Date,
-  pDate: Date,
-  credit: Number,
-  debit: Number, 
+  "Transaction Date": Date,
+  "Posted Date": Date,
+  Category: String,
+  Description: String,
+  Credit: Number,
+  Debit: Number, 
 });
 
 mongoose.model('tactions', tSchema);

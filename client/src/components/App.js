@@ -2,77 +2,67 @@ import React, { Component } from 'react'
 import DataTable from './DataTable.js'
 import FileUpload from './FileUpload.js'
 import Slider from './Slider.js'
+import Loader from './Loader.js'
 import Button from '@material-ui/core/Button';
 import * as ServerRoutes from '../routes/ServerRoutes.js'
 
 class App extends Component {
   state = {
-    renderData: false,
     importData: false,
-    data: {},
-    tableData: {},
+    loading: false,
+    home: true,
+    importFile: false,
+    data: [{"Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate()}],
+    tableData: [{"Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate()}],
     tableHeaders: [],
-    dateRange: [],
+    dateRange: [new Date(), new Date()],
   }
 
-  setTableData = (data, dateRange) => {
-    const getTextDate = (date) => {
-      const monthNum = Number(date.getUTCMonth()) + 1
-      var monthText = monthNum.toString();
-      if (monthNum < 10) {
-        monthText = "0" + monthText;
-      }
+  parseDate = (dateString) => {
+    var year = '';
+    var month = '';
+    var day = '';
 
-      const dayNum = Number(date.getUTCDate());
-      var dayText = dayNum.toString();
-      if (dayNum < 10) {
-        dayText = "0" + dayText;
-      }
-
-      const textDate = monthText + "-" + dayText + '-' + date.getUTCFullYear();
-      return textDate;
+    //get month
+    var index = 0;
+    var checkChar = dateString[index];
+    while (checkChar !== '/') {
+      month += checkChar;
+      index += 1;
+      checkChar = dateString[index];
     }
-    
-    var filteredData = data.filter((entry) => {
-      const checkDate = entry["Transaction Date"];
-      const minTimeCorrection = 24 * 3600000;
-      if ((checkDate.getTime() + minTimeCorrection) <= dateRange[0]
-        || (checkDate.getTime()) > dateRange[1]) {
-        return false
-      }
-      else return true
-    })
+    month = Number(month);
 
-    const tableData = filteredData.map((entry) => {
-      return {
-        Category: entry.Category,
-        Credit: Number(entry.Credit),
-        Debit: Number(entry.Debit),
-        Description: entry.Description,
-        "Post Date": getTextDate(entry["Post Date"]),
-        "Transaction Date": getTextDate(entry["Transaction Date"])
-      }
-    })
-    console.log(tableData);
-    return tableData;
+    //get day
+    index += 1;
+    checkChar = dateString[index];
+    while (checkChar !== '/') {
+      day += checkChar;
+      index += 1;
+      checkChar = dateString[index];
+    }
+    day = Number(day);
+
+    //get year
+    index += 1;
+    year = Number(dateString.slice(index, index + 4));
+
+    //set return object
+    const returnObj = {
+      year: year,
+      month: month,
+      day: day
+    }
+    return returnObj;
   }
 
-  //async function to send csv data file to server and return as JSON object
-  handleGetData = async (event, dataFile) => {
-    var dataFileToSend = new FormData();
-    dataFileToSend.append('file', dataFile);
-    
-    var res = {};
-    try { res = await ServerRoutes.convertData(dataFileToSend) }
-    catch(err) { alert("Unable to import data -->" + err) }
-    
-    var headers = Object.keys(res.data[0]);
-    
+  getHeaders(data) {
+    var headers = Object.keys(data[0]);
     headers = headers.filter((value) => {
-      if (value !== "Card No." && value !== "Posted Date") {
-        return true
+      if (value === "Card No." || value === "Posted Date" || value === "_id" || value === "__v" ) {
+        return false; 
       }
-      return false;
+      return true;
     });
 
     const headersObject = headers.map((value, index) => {
@@ -90,62 +80,41 @@ class App extends Component {
       }
       return returnObject;
     })
+    return headersObject;
 
-    const parseDate = (dateString) => {
-      var year = '';
-      var month = '';
-      var day = '';
+  }
 
-      //get month
-      var index = 0;
-      var checkChar = dateString[index];
-      while (checkChar !== '/') {
-        month += checkChar;
-        index += 1;
-        checkChar = dateString[index];
+  formatData(data, mount) {
+    const formattedData = data.map((entry, index) => {
+      var newPostDate = {};
+      var newTransactionDate = {};
+      if (mount) {
+        newPostDate = new Date(entry["Posted Date"]);
+        newTransactionDate = new Date(entry["Transaction Date"]);
       }
-      month = Number(month);
-
-      //get day
-      index += 1;
-      checkChar = dateString[index];
-      while (checkChar !== '/') {
-        day += checkChar;
-        index += 1;
-        checkChar = dateString[index];
+      else {
+        const postedDateObj = this.parseDate(entry["Posted Date"]);
+        const transactionDateObj = this.parseDate(entry["Transaction Date"]);
+        newPostDate = new Date(Date.UTC(postedDateObj.year, (postedDateObj.month - 1), postedDateObj.day));
+        newTransactionDate = new Date(Date.UTC(transactionDateObj.year, (transactionDateObj.month - 1), transactionDateObj.day));
       }
-      day = Number(day);
-
-      //get year
-      index += 1;
-      year = Number(dateString.slice(index, index + 4));
-
-      //set return object
-      const returnObj = {
-        year: year,
-        month: month,
-        day: day
-      }
-      return returnObj;
-    }
-
-    const formattedData = res.data.map((entry, index) => {
-      const postedDateObj = parseDate(entry["Posted Date"]);
-      const transactionDateObj = parseDate(entry["Transaction Date"]);
       return {
         Category: entry.Category,
         Credit: Number(entry.Credit),
         Debit: Number(entry.Debit),
         Description: entry.Description,
-        "Post Date": new Date(Date.UTC(postedDateObj.year, (postedDateObj.month - 1), postedDateObj.day)),
-        "Transaction Date": new Date(Date.UTC(transactionDateObj.year, (transactionDateObj.month - 1), transactionDateObj.day)),
+        "Posted Date": newPostDate,
+        "Transaction Date": newTransactionDate,
       }
-    });
+    })
+    return formattedData;
+  }
 
-    //set min and max dates
+  //set min and max dates
+  getMinMaxDate(data) {
     var minDate = new Date();
     var maxDate = new Date();
-    formattedData.map((entry, index) => {
+    data.map((entry, index) => {
       if (index === 0) {
         minDate = entry["Transaction Date"];
         maxDate = entry["Transaction Date"];
@@ -154,11 +123,86 @@ class App extends Component {
       else if (entry["Transaction Date"] > maxDate) { maxDate = entry["Transaction Date"] }
       return null;
     })
+    return ([minDate, maxDate]);
+  }
+
+  componentDidMount() {
+    ServerRoutes.getData()
+      .then((res) => {
+        const formattedData = this.formatData(res, true);
+        const tableData = this.setTableData(formattedData, this.getMinMaxDate(formattedData));
+        const headersObject = this.getHeaders(res);
+        this.setState({
+          data: formattedData,
+          tableData: tableData,
+          dateRange: this.getMinMaxDate(formattedData),
+          tableHeaders: headersObject
+        });
+      })
+      .catch((err) => console.log("Unable to retrieve data -->" + err));
+  }
+
+  getTextDate = (date) => {
+    const monthNum = Number(date.getUTCMonth()) + 1
+    var monthText = monthNum.toString();
+    if (monthNum < 10) {
+      monthText = "0" + monthText;
+    }
+
+    const dayNum = Number(date.getUTCDate());
+    var dayText = dayNum.toString();
+    if (dayNum < 10) {
+      dayText = "0" + dayText;
+    }
+
+    const textDate = monthText + "-" + dayText + '-' + date.getUTCFullYear();
+    return textDate;
+  }
+
+  setTableData = (data, dateRange) => {
+    var filteredData = data.filter((entry) => {
+      const checkDate = entry["Transaction Date"];
+      const minTimeCorrection = 24 * 3600000;
+      if ((checkDate.getTime() + minTimeCorrection) <= dateRange[0]
+        || (checkDate.getTime()) > dateRange[1]) {
+        return false
+      }
+      else return true
+    })
+
+    const tableData = filteredData.map((entry) => {
+      return {
+        Category: entry.Category,
+        Credit: Number(entry.Credit),
+        Debit: Number(entry.Debit),
+        Description: entry.Description,
+        "Posted Date": this.getTextDate(entry["Posted Date"]),
+        "Transaction Date": this.getTextDate(entry["Transaction Date"])
+      }
+    })
+    return tableData;
+  }
+
+  //async function to send csv data file to server and return as JSON object
+  handleDataFile = async (event, dataFile) => {
+    var dataFileToSend = new FormData();
+    dataFileToSend.append('file', dataFile);
+
+    var res = {};
+    try { res = await ServerRoutes.convertData(dataFileToSend) }
+    catch (err) { alert("Unable to import data -->" + err) }
+
+
+
+    const headersObject = this.getHeaders(res.data);
+
+
+    const formattedData = this.formatData(res.data, false);
 
     this.setState({
-      dateRange: [minDate, maxDate],
-      renderData: true,
-      tableData: this.setTableData(formattedData, [minDate, maxDate]),
+      dateRange: this.getMinMaxDate(formattedData),
+      importData: true,
+      tableData: this.setTableData(formattedData, this.getMinMaxDate(formattedData)),
       data: formattedData,
       tableHeaders: headersObject
     });
@@ -167,51 +211,71 @@ class App extends Component {
 
   handleDateUpdate = (dateRange) => {
     this.setState({
-      renderData: true,
       tableData: this.setTableData(this.state.data, dateRange.value),
     });
   }
-  
-  handleImport = async (event) => {
-    var res = {};
-    try { res = await ServerRoutes.importData(this.state.data) }
-    catch(err) { alert("Unable to import data -->" + err) }
-    
-    console.log(res);
+
+  handleImport = (event) => {
+    this.setState({ loading: true }, async () => {
+      try { await ServerRoutes.importData(this.state.data) }
+      catch (err) { alert("Unable to import data -->" + err) }
+      this.setState({ loading: false, importFile: false, home: true });
+    });
+  }
+
+  propmptImport = () => {
+    this.setState({ home: false, importFile: true })
   }
 
   render() {
     const {
-      renderData,
+      home,
       importData,
+      importFile,
+
       tableData,
       tableHeaders,
       dateRange,
+      loading,
     } = this.state
-
-    console.log({tableData});
-    if (renderData) {
+    if (home) {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
             <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
             <DataTable data={tableData} headers={tableHeaders} />
-            	<Button onClick={this.handleImport} variant="contained" color="primary" style={{marginTop: '10px'}}>
-        				Import Data
-        			</Button>
+            <Button onClick={this.propmptImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
+              Import New Data
+            </Button>
           </div>
         </div>
       );
     }
     else if (importData) {
-      return (
-     		<div></div> 
-      );
+      if (loading) {
+        return (
+          <div>
+            <Loader />
+          </div>
+        );
+      }
+      else {
+        return (
+          <div className="app" style={{ width: '90%', margin: 'auto' }}>
+            <div className='table-import' style={{ maxWidth: '930px', margin: 'auto' }}>
+              <DataTable data={tableData} headers={tableHeaders} />
+              <Button onClick={this.handleImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
+                Import Data
+                </Button>
+            </div>
+          </div>
+        );
+      }
     }
-    else {
+    else if (importFile) {
       return (
         <div className="App" style={{ width: '90%', margin: 'auto' }}>
-          <FileUpload submitFile={this.handleGetData} />
+          <FileUpload submitFile={this.handleDataFile} />
         </div>
       );
     }

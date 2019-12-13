@@ -1,7 +1,6 @@
 require('dotenv').config();
 var express = require('express');
 const mongoose = require('mongoose');
-var bodyParser = require('body-parser');
 var path = require('path');
 var cors = require('cors');
 const IncomingForm = require('formidable').IncomingForm
@@ -41,27 +40,33 @@ app.post('/import', async function (req, res) {
 	const Tactions = mongoose.model('tactions');
   for (const entry of req.body) {
     const existingTaction = await Tactions.findOne({ 
-      tDate: entry["Transaction Date"],  
-      description: entry.Description,
-      credit: entry.Credit,
-      debit: entry.Debit
+      "Transaction Date": entry["Transaction Date"],  
+      Description: entry.Description,
+      Credit: entry.Credit,
+      Debit: entry.Debit
     });
     if (existingTaction) {
 			continue;
     }
     else {
       const newTaction = await new Tactions({  
-        category: entry.Category,
-        description: entry.Description ,
-        tDate: entry["Transaction Date"],
-        pDate: entry["Post Date"],
-        credit: entry.Credit,
-        debit: entry.Debit,
+        "Transaction Date": entry["Transaction Date"],
+        "Posted Date": entry["Posted Date"],
+        Category: entry.Category,
+        Description: entry.Description,
+        Credit: entry.Credit,
+        Debit: entry.Debit,
       }).save()
       console.log(newTaction);
     }
   }
   res.send("Import Complete");
+});
+
+app.get('/data', async function(req, res) {
+  const Tactions = mongoose.model('tactions');
+  const data = await Tactions.find( {} );
+  res.send(data);
 });
 
 app.get('*', (req, res) => {

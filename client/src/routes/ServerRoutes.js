@@ -18,3 +18,12 @@ export const importData = async (data) => {
   	console.log(response);
     return response;
 }
+
+export const getData = async () => {
+    const options = {
+        method: 'GET',
+        url: '/data',
+    }
+    const response = await axios(options);
+    return response.data;
+}
