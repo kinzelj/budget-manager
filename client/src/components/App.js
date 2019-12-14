@@ -193,12 +193,9 @@ class App extends Component {
     try { res = await ServerRoutes.convertData(dataFileToSend) }
     catch (err) { alert("Unable to import data -->" + err) }
 
+    const headersObject = this.getHeaders(res);
 
-
-    const headersObject = this.getHeaders(res.data);
-
-
-    const formattedData = this.formatData(res.data, false);
+    const formattedData = this.formatData(res, false);
 
     this.setState({
       dateRange: this.getMinMaxDate(formattedData),
