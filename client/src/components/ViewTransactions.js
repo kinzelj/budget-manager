@@ -48,7 +48,7 @@ class ViewTransactions extends Component {
   }
   
   handleRedirectImport = () => {
-    this.setState({redirect: 'import'});
+    this.props.handleRedirect({text: 'Import Data'});
   }
 
   render() {
@@ -58,7 +58,6 @@ class ViewTransactions extends Component {
       dateRange,
       redirect,
     } = this.state
-    console.log(redirect);
     switch (redirect){
       case ('import'): {
         return (

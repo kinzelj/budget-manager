@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
 import Loader from './Loader.js';
 import Button from '@material-ui/core/Button';
 import DataTable from './DataTable.js';
@@ -52,7 +51,9 @@ class FileUpload extends Component {
         await ServerRoutes.importData(this.state.importData);
         await this.getData();
         //route to ViewTransactions page
-        this.setState({reDirect: true});
+        this.setState({loading: false}, () => {
+          this.props.handleRedirect({text: 'View Transaction Data'});
+        });
       }
       catch (err) { alert("Unable to import data -->" + err) }
     });
@@ -88,14 +89,9 @@ class FileUpload extends Component {
       tableHeaders,
       loading,
       dataLoaded,
-      reDirect,
     } = this.state
-    if (reDirect){
-      return (
-        <Redirect to="/transactions" />
-      );
-    }
-    else if (loading){
+
+    if (loading){
       return (
         <div ><Loader style={{ margin: 'auto' }} /></div>
       );
