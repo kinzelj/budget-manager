@@ -1,6 +1,5 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -106,50 +105,45 @@ export default function RangeSlider(props) {
   
   return (
     <div >
-      <Typography id="range-slider" gutterBottom>
-        Date Range
-      </Typography>
-    
     	<Grid container spacing={2} alignItems="center">
-        <Grid item xs>
-          <Slider
-          value={value}
-          onChange={handleChange}
-          valueLabelDisplay="off"
-          aria-labelledby="range-slider"
-    			min={getMin()}
-    			max={getMax()}
-        />
-        </Grid>
-       
-        <Grid item>
-          <TextField
-            id="dateMin"
-            label="Min Date"
-            type="date"
-            value={setMinDate(value)}
-            className={classes.textField}
-            InputLabelProps={{ shrink: true, }}
-            onChange={handleMinInputChange}
+          <Grid item xs>
+            <Slider
+            value={value}
+            onChange={handleChange}
+            valueLabelDisplay="off"
+            aria-labelledby="range-slider"
+            min={getMin()}
+            max={getMax()}
           />
-        </Grid>
-        <Grid item>
-          <TextField
-            id="dateMax"
-            label="Max Date"
-            type="date"
-            value={setMaxDate(value)}
-            className={classes.textField}
-            InputLabelProps={{ shrink: true, }}
-            onChange={handleMaxInputChange}
-          />
-        </Grid>
+          </Grid>
+          <Grid item>
+            <TextField
+              id="dateMin"
+              label="Min Date"
+              type="date"
+              value={setMinDate(value)}
+              className={classes.textField}
+              InputLabelProps={{ shrink: true, }}
+              onChange={handleMinInputChange}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              id="dateMax"
+              label="Max Date"
+              type="date"
+              value={setMaxDate(value)}
+              className={classes.textField}
+              InputLabelProps={{ shrink: true, }}
+              onChange={handleMaxInputChange}
+            />
+          </Grid>
 
-				<Grid item>
-         <Button onClick={handleUpdate} variant="contained" color="primary">
-          Update Table
-        </Button>
-       </ Grid>
+          <Grid item>
+           <Button onClick={handleUpdate} variant="contained" color="primary">
+            Update Table
+          </Button>
+         </ Grid>
 
       </Grid>
 
