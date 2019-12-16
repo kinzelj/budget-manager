@@ -67,14 +67,15 @@ export default function RangeSlider(props) {
     const textDate = minDate.getUTCFullYear() + "-" + monthText + "-" + dayText;
     return textDate;
   }
-  
+
   const [value, setValue] = React.useState([props.dateRange[0].getTime(),props.dateRange[1].getTime()]);
   
-  const getDatesCallback = React.useCallback(() => {
-    setValue([ props.dateRange[0].getTime(), props.dateRange[1].getTime()]);
-  }, [setValue, props]);
+  // const getDatesCallback = React.useCallback(() => {
+  //   console.log('test');
+  //   setValue([ props.dateRange[0].getTime(), props.dateRange[1].getTime()]);
+  // }, [setValue, props]);
   
-  React.useEffect(() => { getDatesCallback() }, [getDatesCallback]);
+  // React.useEffect(() => { getDatesCallback() }, [getDatesCallback]);
   
   const handleChange = (event, newValue) => {
     setValue(newValue);

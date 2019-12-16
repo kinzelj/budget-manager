@@ -1,21 +1,48 @@
-import React, { Component } from 'react'
-import DataTable from './DataTable.js'
-import FileUpload from './FileUpload.js'
-import Slider from './Slider.js'
-import Loader from './Loader.js'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import DataTable from './DataTable.js';
+import FileUpload from './FileUpload.js';
+import Slider from './Slider.js';
+import Loader from './Loader.js';
 import Button from '@material-ui/core/Button';
-import * as ServerRoutes from '../routes/ServerRoutes.js'
+import * as ServerRoutes from '../routes/ServerRoutes.js';
+import * as actions from '../actions/actions.js';
 
 class App extends Component {
   state = {
-    importData: false,
+    importRoute: false,
     loading: false,
     home: true,
     importFile: false,
-    data: [{"Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate()}],
-    tableData: [{"Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate()}],
+    data: [{ "Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate() }],
+    importData: [{ "Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate() }],
+    tableData: [{ "Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate() }],
     tableHeaders: [],
-    dateRange: [new Date(), new Date()],
+    dateRange: [new Date(0), new Date()],
+  }
+
+  componentDidMount() {
+    this.getData();
+  }
+
+  getData = async () => {
+    try {
+      //call redux fetchData action
+      await this.props.fetchData()
+
+      //format data and set component state
+      const formattedData = this.formatData(this.props.data, true);
+      const tableData = this.setTableData(formattedData, this.getMinMaxDate(formattedData));
+      const headersObject = this.getHeaders(this.props.data);
+      const dateRange = this.getMinMaxDate(formattedData);
+      this.setState({
+        data: formattedData,
+        tableData: tableData,
+        dateRange: dateRange,
+        tableHeaders: headersObject
+      });
+    }
+    catch (err) { console.log("Unable to retrieve data -->" + err) };
   }
 
   parseDate = (dateString) => {
@@ -59,8 +86,8 @@ class App extends Component {
   getHeaders(data) {
     var headers = Object.keys(data[0]);
     headers = headers.filter((value) => {
-      if (value === "Card No." || value === "Posted Date" || value === "_id" || value === "__v" ) {
-        return false; 
+      if (value === "Card No." || value === "Posted Date" || value === "_id" || value === "__v") {
+        return false;
       }
       return true;
     });
@@ -126,23 +153,6 @@ class App extends Component {
     return ([minDate, maxDate]);
   }
 
-  componentDidMount() {
-    ServerRoutes.getData()
-      .then((res) => {
-        const formattedData = this.formatData(res, true);
-        const tableData = this.setTableData(formattedData, this.getMinMaxDate(formattedData));
-        const headersObject = this.getHeaders(res);
-      	const dateRange = this.getMinMaxDate(formattedData);
-        this.setState({
-          data: formattedData,
-          tableData: tableData,
-          dateRange: dateRange,
-          tableHeaders: headersObject
-        });
-      })
-      .catch((err) => console.log("Unable to retrieve data -->" + err));
-  }
-
   getTextDate = (date) => {
     const monthNum = Number(date.getUTCMonth()) + 1
     var monthText = monthNum.toString();
@@ -199,9 +209,9 @@ class App extends Component {
 
     this.setState({
       dateRange: this.getMinMaxDate(formattedData),
-      importData: true,
+      importRoute: true,
       tableData: this.setTableData(formattedData, this.getMinMaxDate(formattedData)),
-      data: formattedData,
+      importData: formattedData,
       tableHeaders: headersObject
     });
 
@@ -215,21 +225,24 @@ class App extends Component {
 
   handleImport = (event) => {
     this.setState({ loading: true }, async () => {
-      try { await ServerRoutes.importData(this.state.data) }
+      try {
+        await ServerRoutes.importData(this.state.importData);
+        await this.getData();
+        this.setState({ loading: false, home: true });
+      }
       catch (err) { alert("Unable to import data -->" + err) }
-      this.setState({ loading: false, importFile: false, home: true });
     });
   }
 
   propmptImport = () => {
-    this.setState({ home: false, importFile: true })
+    this.setState({ home: false, importRoute: false, importFile: true })
   }
 
   render() {
     const {
       home,
-      importData,
       importFile,
+      importRoute,
 
       tableData,
       tableHeaders,
@@ -249,11 +262,11 @@ class App extends Component {
         </div>
       );
     }
-    else if (importData) {
+    else if (importRoute) {
       if (loading) {
         return (
-          <div>
-            <Loader />
+          <div >
+            <Loader style={{ margin: 'auto' }} />
           </div>
         );
       }
@@ -280,4 +293,8 @@ class App extends Component {
   }
 }
 
-export default App;
+function mapStateToProps(state) {
+  return { data: state.data }
+}
+
+export default connect(mapStateToProps, actions)(App);
