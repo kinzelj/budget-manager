@@ -1,0 +1,16 @@
+.data-table {
+  margin: 5px;
+}
+.table-head, .table-body {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  width: 100%;
+  min-width: 350px;
+  table-layout: fixed;
+}
+
+.table-head {
+}
+
+.table-body {
+}
+

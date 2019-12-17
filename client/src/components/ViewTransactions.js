@@ -69,7 +69,7 @@ class ViewTransactions extends Component {
           <div className="app" style={{ width: '90%', margin: 'auto' }}>
             <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
               <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
-              <DataTable data={tableData} headers={tableHeaders} />
+              <DataTable data={tableData} headers={tableHeaders} minWidth={930}/>
               <Button onClick={this.handleRedirectImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
                 Import New Data
               </Button>

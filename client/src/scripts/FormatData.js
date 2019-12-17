@@ -1,5 +1,3 @@
-import React from 'react';
-import { Editors } from "react-data-grid-addons";
 export const parseDate = (dateString) => {
   var year = '';
   var month = '';
@@ -39,28 +37,6 @@ export const parseDate = (dateString) => {
 }
 
 export const getHeaders = (data) => {
-  const { DropDownEditor } = Editors;
-  const issueTypes = [
-    { id: "Merchandise", value: "Merchandise" },
-    { id: "Dining", value: "Dining" },
-    { id: "Payment/Credit", value: "Payment/Credit" },
-    { id: "Gas/Automotive", value: "Gas/Automotive" },
-    { id: "Other Travel", value: "Other Travel" },
-    { id: "Phone/Cable", value: "Phone/Cable" },
-    { id: "Entertainment", value: "Entertainmanet" },
-    { id: "Other Services", value: "Other Services" },
-    { id: "Internet", value: "Internet" },
-    { id: "Other", value: "Other" },
-    { id: "Lodging", value: "Lodging" },
-    { id: "Insurance", value: "Insurance" },
-    { id: "Fee/Interest Charge", value: "Fee/Interest Charge" },
-    { id: "Health Care", value: "Health Care" },
-    { id: "Car Rental", value: "Car Rental" },
-    { id: "Professional Services", value: "Professional Services" },
-    { id: "Airfare", value: "Airfare" },
-    { id: "Work Expense", value: "Work Expense" },
-  ];
-  const IssueTypeEditor = <DropDownEditor options={issueTypes} />;
   var headers = Object.keys(data[0]);
   headers = headers.filter((value) => {
     if (value === "Card No." || value === "Posted Date" || value === "_id" || value === "__v") {
@@ -74,13 +50,14 @@ export const getHeaders = (data) => {
       width: 150,
       key: value,
       name: value,
-      numeric: false
+      numeric: false,
     }
     if (value === "Category") {
-      returnObject.editor = IssueTypeEditor;
+      returnObject.theme = 'dropdown';
     }
     if (value === "Credit" || value === "Debit") {
-      returnObject.numeric = true
+      returnObject.theme = 'currency';
+      returnObject.numeric = true;
     }
     if (value === "Description") {
       returnObject.width = 300
