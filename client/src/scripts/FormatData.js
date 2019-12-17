@@ -1,4 +1,5 @@
-
+import React from 'react';
+import { Editors } from "react-data-grid-addons";
 export const parseDate = (dateString) => {
   var year = '';
   var month = '';
@@ -38,6 +39,28 @@ export const parseDate = (dateString) => {
 }
 
 export const getHeaders = (data) => {
+  const { DropDownEditor } = Editors;
+  const issueTypes = [
+    { id: "Merchandise", value: "Merchandise" },
+    { id: "Dining", value: "Dining" },
+    { id: "Payment/Credit", value: "Payment/Credit" },
+    { id: "Gas/Automotive", value: "Gas/Automotive" },
+    { id: "Other Travel", value: "Other Travel" },
+    { id: "Phone/Cable", value: "Phone/Cable" },
+    { id: "Entertainment", value: "Entertainmanet" },
+    { id: "Other Services", value: "Other Services" },
+    { id: "Internet", value: "Internet" },
+    { id: "Other", value: "Other" },
+    { id: "Lodging", value: "Lodging" },
+    { id: "Insurance", value: "Insurance" },
+    { id: "Fee/Interest Charge", value: "Fee/Interest Charge" },
+    { id: "Health Care", value: "Health Care" },
+    { id: "Car Rental", value: "Car Rental" },
+    { id: "Professional Services", value: "Professional Services" },
+    { id: "Airfare", value: "Airfare" },
+    { id: "Work Expense", value: "Work Expense" },
+  ];
+  const IssueTypeEditor = <DropDownEditor options={issueTypes} />;
   var headers = Object.keys(data[0]);
   headers = headers.filter((value) => {
     if (value === "Card No." || value === "Posted Date" || value === "_id" || value === "__v") {
@@ -49,9 +72,12 @@ export const getHeaders = (data) => {
   const headersObject = headers.map((value, index) => {
     var returnObject = {
       width: 150,
-      label: value,
-      dataKey: value,
+      key: value,
+      name: value,
       numeric: false
+    }
+    if (value === "Category") {
+      returnObject.editor = IssueTypeEditor;
     }
     if (value === "Credit" || value === "Debit") {
       returnObject.numeric = true
@@ -113,6 +139,7 @@ export const setTableData = (data, dateRange) => {
 
   const tableData = filteredData.map((entry) => {
     return {
+      id: entry.id,
       Category: entry.Category,
       Credit: Number(entry.Credit),
       Debit: Number(entry.Debit),
@@ -139,6 +166,7 @@ export const formatData = (data, mount) => {
       newTransactionDate = new Date(Date.UTC(transactionDateObj.year, (transactionDateObj.month - 1), transactionDateObj.day));
     }
     return {
+      id: entry._id,
       Category: entry.Category,
       Credit: Number(entry.Credit),
       Debit: Number(entry.Debit),
