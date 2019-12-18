@@ -31,6 +31,7 @@ const styles = () => ({
 
 
 export default function DataTable(props) {
+  console.log(props);
   const classes = styles();
 
   const getStyles = (header, type) => {
@@ -64,6 +65,19 @@ export default function DataTable(props) {
     return headerStyle;
   }
 
+  const getCellContents = (value, header) => {
+    if (header.type === 'currency' && value.toString() === '0.00') {
+      return '';
+    }
+    else if (header.type === 'dropdown' && header.edit === 'true' ) {
+      console.log('test');
+      return value;
+    }
+    else {
+      return value;
+    }
+  }
+  
   const renderTableHeader = (headerData) => {
     const headersJSX = headerData.map((header) => {
 
@@ -87,13 +101,9 @@ export default function DataTable(props) {
         //add theme style to value style object or set default style
         var headerStyle = getStyles(header, 'body');
 
-        var displayContents;
-        if (header.theme === 'currency' && row[header.name].toString() === '0.00') {
-          displayContents = '';
-        }
-        else {
-          displayContents = row[header.name];
-        }
+        
+        var displayContents = getCellContents(row[header.name], header);
+        
 
         return (
           <td className='body-cell' key={cellKey} style={headerStyle}>
@@ -127,23 +137,4 @@ export default function DataTable(props) {
   )
 }
 
-// const issueTypes = [
-//     { id: "Merchandise", value: "Merchandise" },
-//     { id: "Dining", value: "Dining" },
-//     { id: "Payment/Credit", value: "Payment/Credit" },
-//     { id: "Gas/Automotive", value: "Gas/Automotive" },
-//     { id: "Other Travel", value: "Other Travel" },
-//     { id: "Phone/Cable", value: "Phone/Cable" },
-//     { id: "Entertainment", value: "Entertainmanet" },
-//     { id: "Other Services", value: "Other Services" },
-//     { id: "Internet", value: "Internet" },
-//     { id: "Other", value: "Other" },
-//     { id: "Lodging", value: "Lodging" },
-//     { id: "Insurance", value: "Insurance" },
-//     { id: "Fee/Interest Charge", value: "Fee/Interest Charge" },
-//     { id: "Health Care", value: "Health Care" },
-//     { id: "Car Rental", value: "Car Rental" },
-//     { id: "Professional Services", value: "Professional Services" },
-//     { id: "Airfare", value: "Airfare" },
-//     { id: "Work Expense", value: "Work Expense" },
-//   ];
+

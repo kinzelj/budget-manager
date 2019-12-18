@@ -8,6 +8,27 @@ import Loader from './Loader.js';
 import * as FormatData from '../scripts/FormatData.js';
 import * as actions from '../redux/actions.js';
 
+const selectOptions = [
+    { id: "Merchandise", value: "Merchandise" },
+    { id: "Dining", value: "Dining" },
+    { id: "Payment/Credit", value: "Payment/Credit" },
+    { id: "Gas/Automotive", value: "Gas/Automotive" },
+    { id: "Other Travel", value: "Other Travel" },
+    { id: "Phone/Cable", value: "Phone/Cable" },
+    { id: "Entertainment", value: "Entertainmanet" },
+    { id: "Other Services", value: "Other Services" },
+    { id: "Internet", value: "Internet" },
+    { id: "Other", value: "Other" },
+    { id: "Lodging", value: "Lodging" },
+    { id: "Insurance", value: "Insurance" },
+    { id: "Fee/Interest Charge", value: "Fee/Interest Charge" },
+    { id: "Health Care", value: "Health Care" },
+    { id: "Car Rental", value: "Car Rental" },
+    { id: "Professional Services", value: "Professional Services" },
+    { id: "Airfare", value: "Airfare" },
+    { id: "Work Expense", value: "Work Expense" },
+  ];
+
 class ViewTransactions extends Component {
   state = {
     loading: true,
@@ -52,7 +73,7 @@ class ViewTransactions extends Component {
   }
   
   handleRedirectImport = () => {
-    this.props.handleRedirect({text: 'Import Data'});
+    this.props.handleRedirect('Import Data');
   }
 
   render() {
@@ -87,9 +108,12 @@ class ViewTransactions extends Component {
             <div className="app" style={{ width: '90%', margin: 'auto' }}>
               <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
                 <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
-                <DataTable data={tableData} headers={tableHeaders} />
+                <DataTable data={tableData} headers={tableHeaders} selectOptions={selectOptions} />
                 <Button onClick={this.handleRedirectImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
                   Import New Data
+                </Button>
+                <Button onClick={this.handleEditCategories} variant="contained" color="primary" style={{ marginTop: '10px', marginLeft: '20px' }}>
+            			Edit Categories
                 </Button>
               </div>
             </div>

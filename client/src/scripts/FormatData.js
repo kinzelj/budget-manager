@@ -51,11 +51,14 @@ export const getHeaders = (data) => {
       key: value,
       name: value,
       numeric: false,
+      edit: false,
     }
     if (value === "Category") {
       returnObject.theme = 'dropdown';
+      returnObject.edit = true;
     }
     if (value === "Credit" || value === "Debit") {
+      returnObject.numeric = true;
       returnObject.theme = 'currency';
       returnObject.style.width = 75;
     }

@@ -78,8 +78,18 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const getNavOptions = () => ({
+  options: [
+  	{ text: "Home", icon: "large home icon"},
+  	{ text: "View Transaction Data", icon: "large database icon"},
+  	{ text: "Import Data", icon: "large upload icon"},
+  	{ text: "Analysis", icon: "large table icon"},
+  ]
+})
+
 export default function MiniDrawer() {
   const classes = useStyles();
+  const navOptions = getNavOptions().options;
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [navSelect, setSelect] = React.useState('Home');
@@ -93,14 +103,16 @@ export default function MiniDrawer() {
   };
   
   const handleMenuClick = (value) => {
-    setSelect(value.text);
+    setSelect(value);
   }
   
   const getContent = () => {
+    console.log(navSelect);
     switch( navSelect ) {
       case ('View Transaction Data'):  
       	return(<ViewTransactions handleRedirect={handleMenuClick}/>);
      	case ('Import Data'): 
+        console.log('test');
         return(<FileUpload handleRedirect={handleMenuClick}/>);
        case ('Analysis'):
       default:
@@ -158,10 +170,10 @@ export default function MiniDrawer() {
         </div>
 
         <List>
-          {['Home', 'View Transaction Data', 'Import Data', 'Analysis'].map((text, index) => (
-            <ListItem button onClick={() => handleMenuClick({text})} value={text} key={text}>
-              <ListItemIcon>{<i className="upload icon"></i>}</ListItemIcon>
-              <ListItemText primary={text} />
+          {navOptions.map((option, index) => (
+            <ListItem button onClick={() => handleMenuClick(option.text)} value={option.text} key={option.text}>
+              <ListItemIcon>{<i className={option.icon} style={{marginLeft: '10px'}}></i>}</ListItemIcon>
+              <ListItemText primary={option.text} />
             </ListItem>
           ))}
         </List>
