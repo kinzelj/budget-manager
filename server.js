@@ -72,22 +72,22 @@ app.post('/import', async function (req, res) {
   res.send(returnContext);
 });
 
-app.post('/update-remote', async function (req, res) {
-  try {
-    //get data from local database
-    const dbTactions = DB.model('tactions');
-    const data = await dbTactions.find({});
+// app.post('/update-remote', async function (req, res) {
+//   try {
+//     //get data from local database
+//     const dbTactions = DB.model('tactions');
+//     const data = await dbTactions.find({});
 
-    // remove documents from remote collection and insert data from local database
-    const remoteTactions = remoteDB.model('tactions');
-    await remoteTactions.deleteMany({}, async () => {
-      await remoteTactions.collection.insertMany(data, function (err) {
-        res.send("Local and remote databases updated");
-      });
-    });
-  }
-  catch (error) { console.log(error); }
-});
+//     // remove documents from remote collection and insert data from local database
+//     const remoteTactions = remoteDB.model('tactions');
+//     await remoteTactions.deleteMany({}, async () => {
+//       await remoteTactions.collection.insertMany(data, function (err) {
+//         res.send("Local and remote databases updated");
+//       });
+//     });
+//   }
+//   catch (error) { console.log(error); }
+// });
 
 
 

@@ -1,16 +1,38 @@
+:root {
+  --scroll-width: 17px;
+  --max-table-height: 700px;  
+  --min-table-width: 700px;
+}
+
 .data-table {
   margin: 5px;
+  width: 100%;
+  min-width: var(--min-table-width);
 }
+.table-head-div {
+  table-layout: fixed;
+  margin-right: var(--scroll-width);
+}
+
+.table-body-div {
+  overflow-y: auto;
+  max-height: var(--max-table-height);
+}
+
 .table-head, .table-body {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   width: 100%;
-  min-width: 350px;
-  table-layout: fixed;
-}
-
-.table-head {
+  border: 2px solid rgb(117, 117, 117)
 }
 
 .table-body {
+  border-top: 0;
 }
 
+.table-head th, .table-body td {
+  padding: 5px;
+}
+
+.table-body td {
+  border: 0.05px solid rgb(219, 219, 219);
+}

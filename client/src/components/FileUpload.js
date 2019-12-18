@@ -21,7 +21,7 @@ class FileUpload extends Component {
       selectedFile: event.target.files[0],
       loaded: 0,
     }, () => {
-    	this.handleDataFile(event, this.state.selectedFile);
+      this.handleDataFile(event, this.state.selectedFile);
     })
   }
 
@@ -44,21 +44,21 @@ class FileUpload extends Component {
     }
     catch (err) { console.log("Unable to retrieve data -->" + err) };
   }
-  
+
   handleImport = (event) => {
     this.setState({ loading: true }, async () => {
       try {
         await ServerRoutes.importData(this.state.importData);
         await this.getData();
         //route to ViewTransactions page
-        this.setState({loading: false}, () => {
-          this.props.handleRedirect({text: 'View Transaction Data'});
+        this.setState({ loading: false }, () => {
+          this.props.handleRedirect({ text: 'View Transaction Data' });
         });
       }
       catch (err) { alert("Unable to import data -->" + err) }
     });
   }
-  
+
   //async function to send csv data file to server and return as JSON object
   handleDataFile = async (event) => {
     var dataFileToSend = new FormData();
@@ -71,7 +71,7 @@ class FileUpload extends Component {
     const headersObject = FormatData.getHeaders(res);
     const formattedData = FormatData.formatData(res, false);
     const dateRange = FormatData.getMinMaxDate(formattedData);
-          
+
     this.setState({
       dateRange: dateRange,
       tableData: FormatData.setTableData(formattedData, dateRange),
@@ -91,9 +91,11 @@ class FileUpload extends Component {
       dataLoaded,
     } = this.state
 
-    if (loading){
+    if (loading) {
       return (
-        <div ><Loader style={{ margin: 'auto' }} /></div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+          <Loader />
+        </div>
       );
     }
     else if (dataLoaded) {

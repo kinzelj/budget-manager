@@ -47,7 +47,7 @@ export const getHeaders = (data) => {
 
   const headersObject = headers.map((value, index) => {
     var returnObject = {
-      width: 150,
+      style: {width: 150, textAlign: 'left'},
       key: value,
       name: value,
       numeric: false,
@@ -57,10 +57,11 @@ export const getHeaders = (data) => {
     }
     if (value === "Credit" || value === "Debit") {
       returnObject.theme = 'currency';
-      returnObject.numeric = true;
+      returnObject.style.width = 75;
     }
     if (value === "Description") {
-      returnObject.width = 300
+      returnObject.style.width = 300;
+      returnObject.style.textAlign = 'left';
     }
     return returnObject;
   })
@@ -118,8 +119,8 @@ export const setTableData = (data, dateRange) => {
     return {
       id: entry.id,
       Category: entry.Category,
-      Credit: Number(entry.Credit),
-      Debit: Number(entry.Debit),
+      Credit: Number(entry.Credit).toFixed(2),
+      Debit: Number(entry.Debit).toFixed(2),
       Description: entry.Description,
       "Posted Date": getTextDate(entry["Posted Date"]),
       "Transaction Date": getTextDate(entry["Transaction Date"])
@@ -145,8 +146,8 @@ export const formatData = (data, mount) => {
     return {
       id: entry._id,
       Category: entry.Category,
-      Credit: Number(entry.Credit),
-      Debit: Number(entry.Debit),
+      Credit: Number(entry.Credit).toFixed(2),
+      Debit: Number(entry.Debit).toFixed(2),
       Description: entry.Description,
       "Posted Date": newPostDate,
       "Transaction Date": newTransactionDate,

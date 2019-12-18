@@ -104,7 +104,7 @@ export default function RangeSlider(props) {
   }
   
   return (
-    <div >
+    <div style={{minWidth: '683px', marginRight: '17px'}}>
     	<Grid container spacing={2} alignItems="center">
           <Grid item xs>
             <Slider

@@ -10,11 +10,11 @@ export const convertData = async (dataFileToSend) => {
 }
 
 export const importData = async (data) => {
-    const env = await axios.get("/get-env");
-    if (env.data !== 'LOCAL') {
-      alert("Importing data from remote environment not allowed!");
-      return;
-    }
+    // const env = await axios.get("/get-env");
+    // if (env.data !== 'LOCAL') {
+    //   alert("Importing data from remote environment not allowed!");
+    //   return;
+    // }
 
     const options = {
         method: 'POST',
@@ -23,17 +23,17 @@ export const importData = async (data) => {
     }
     const res = await axios(options);
 
-    if(res.data.env === 'LOCAL') {
-      const options = {
-          method: 'POST',
-          url: '/update-remote',
-      }
-      async function updateRemote() {
-        const res = await axios(options);
-        console.log(res.data);
-      }
-      updateRemote();
-    }
+    // if(res.data.env === 'LOCAL') {
+    //   const options = {
+    //       method: 'POST',
+    //       url: '/update-remote',
+    //   }
+    //   async function updateRemote() {
+    //     const res = await axios(options);
+    //     console.log(res.data);
+    //   }
+    //   updateRemote();
+    // }
     return res.data;
 }
 
