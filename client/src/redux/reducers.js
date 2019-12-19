@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 
 const dataReducer = function (state = {}, action) {
     switch (action.type) {
-        case 'fetch_data': {
+        case 'fetch-data': {
             return action.payload;
         }
         default: {

@@ -8,6 +8,7 @@ var csv = require('csvtojson')
 const keys = require('./config/keys');
 
 require('./models/Tactions');
+require('./models/Settings');
 
 var app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -21,10 +22,6 @@ var corsOptions = {
 app.use(cors(corsOptions))
 
 const DB = mongoose.createConnection(keys.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
-var remoteDB = null;
-if (process.env.ENVIRONMENT === 'LOCAL') {
-  remoteDB = mongoose.createConnection(keys.remoteURI, { useNewUrlParser: true, useUnifiedTopology: true });
-}
 
 const port = process.env.PORT || 5000;
 
@@ -93,8 +90,28 @@ app.post('/import', async function (req, res) {
 
 app.get('/data', async function (req, res) {
   const Tactions = DB.model('tactions');
-  const data = await Tactions.find({});
+  const data = await Tactions.find().sort({"Transaction Date": -1});
   res.send(data);
+});
+
+app.post('/update-categories', async function (req, res) {
+  const Tactions = DB.model('tactions');
+  for (const entry of req.body){
+    await Tactions.updateOne({_id: entry.id},{
+      $set: { Category: entry.newCategory }
+    });
+  }
+  res.send(req.body);
+});
+
+//get budget settings from database
+app.get('/get-settings', function (req, res) {
+  const Settings = DB.model('budget-settings');
+});
+
+//update budget settings in database
+app.post('/update-settings', async function (req, res) {
+  const Settings = DB.model('budget-settings');
 });
 
 app.get('/get-env', function (req, res) {

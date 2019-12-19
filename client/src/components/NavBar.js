@@ -107,7 +107,6 @@ export default function MiniDrawer() {
   }
   
   const getContent = () => {
-    console.log(navSelect);
     switch( navSelect ) {
       case ('View Transaction Data'):  
       	return(<ViewTransactions handleRedirect={handleMenuClick}/>);

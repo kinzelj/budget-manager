@@ -31,7 +31,6 @@ const styles = () => ({
 
 
 export default function DataTable(props) {
-  console.log(props);
   const classes = styles();
 
   const getStyles = (header, type) => {
@@ -65,19 +64,49 @@ export default function DataTable(props) {
     return headerStyle;
   }
 
-  const getCellContents = (value, header) => {
-    if (header.type === 'currency' && value.toString() === '0.00') {
+  function handleCategoryChange(event, index) {
+    props.categoryChange(event.target.value, event.target.id, index);
+  }
+
+  const getCellContents = (row, header, index) => {
+    const value = row[header.name];
+    if (header.theme === 'currency' && value.toString() === '0.00') {
       return '';
     }
-    else if (header.type === 'dropdown' && header.edit === 'true' ) {
-      console.log('test');
-      return value;
+
+    //dropdown cell content
+    else if (header.theme === 'dropdown' && props.edit === true) {
+      const getOptions = () => {
+        const optionsJSX = header.options.map((option, index) => {
+          return (
+            <option key={option.value + index} value={option.value}>{option.value}</option>
+          )
+        })
+        return optionsJSX;
+      }
+      const dropdownJSX = () => {
+        return (
+          <select 
+            className="cell-select" 
+            key={"select"+ index}
+            id={row.id} 
+            value={value}
+            onChange={(e)=>{handleCategoryChange(e, index)}}
+          >{getOptions()}</select>
+        );
+
+      }
+      const selectReturn = dropdownJSX();
+      return selectReturn;
+      
     }
+
+    //default cell content
     else {
       return value;
     }
   }
-  
+
   const renderTableHeader = (headerData) => {
     const headersJSX = headerData.map((header) => {
 
@@ -101,9 +130,8 @@ export default function DataTable(props) {
         //add theme style to value style object or set default style
         var headerStyle = getStyles(header, 'body');
 
-        
-        var displayContents = getCellContents(row[header.name], header);
-        
+        var displayContents = getCellContents(row, header, index);
+
 
         return (
           <td className='body-cell' key={cellKey} style={headerStyle}>
@@ -127,14 +155,12 @@ export default function DataTable(props) {
         </table>
       </div>
       <div className='table-body-div'>
-      <table className='table-body' cellPadding="0" cellSpacing="0" border="0">
-        <tbody>
-          {renderTableData(props.headers, props.data)}
-        </tbody>
-      </table>
+        <table className='table-body' cellPadding="0" cellSpacing="0" border="0">
+          <tbody>
+            {renderTableData(props.headers, props.data)}
+          </tbody>
+        </table>
       </div>
     </div>
   )
 }
-
-

@@ -1,31 +1,69 @@
+const categoryOptions = [
+  { id: "Airfare", value: "Airfare" },
+  { id: "Car Rental", value: "Car Rental" },
+  { id: "Car Expense", value: "Car Expense" },
+  { id: "Dining", value: "Dining" },
+  { id: "Education", value: "Education" },
+  { id: "Entertainment", value: "Entertainment" },
+  { id: "Gas/Automotive", value: "Gas/Automotive" },
+  { id: "Groceries", value: "Groceries" },
+  { id: "Health Care", value: "Health Care" },
+  { id: "Insurance", value: "Insurance" },
+  { id: "Internet", value: "Internet" },
+  { id: "Lodging", value: "Lodging" },
+  { id: "Merchandise", value: "Merchandise" },
+  { id: "Other", value: "Other" },
+  { id: "Other Services", value: "Other Services" },
+  { id: "Other Travel", value: "Other Travel" },
+  { id: "Payment/Credit", value: "Payment/Credit" },
+  { id: "Phone/Cable", value: "Phone/Cable" },
+  { id: "Phone", value: "Phone" },
+  { id: "Professional Services", value: "Professional Services" },
+  { id: "Subscriptions", value: "Subscriptions" },
+  { id: "TV/Cable", value: "TV/Cable" },
+  { id: "Work Expense", value: "Work Expense" },
+];
+
+
 export const parseDate = (dateString) => {
+  console.log(dateString);
   var year = '';
   var month = '';
   var day = '';
 
-  //get month
-  var index = 0;
-  var checkChar = dateString[index];
-  while (checkChar !== '/') {
-    month += checkChar;
+  //  yyyy-mm-dd format
+  if (dateString[4] === '-') {
+    year = Number(dateString.slice(0, 4));
+    month = Number(dateString.slice(5, 7));
+    day = Number(dateString.slice(8, 10));
+  }
+
+  //  mm/dd/yyy format
+  else {
+    //get month
+    var index = 0;
+    var checkChar = dateString[index];
+    while (checkChar !== '/') {
+      month += checkChar;
+      index += 1;
+      checkChar = dateString[index];
+    }
+    month = Number(month);
+
+    //get day
     index += 1;
     checkChar = dateString[index];
-  }
-  month = Number(month);
+    while (checkChar !== '/') {
+      day += checkChar;
+      index += 1;
+      checkChar = dateString[index];
+    }
+    day = Number(day);
 
-  //get day
-  index += 1;
-  checkChar = dateString[index];
-  while (checkChar !== '/') {
-    day += checkChar;
+    //get year
     index += 1;
-    checkChar = dateString[index];
+    year = Number(dateString.slice(index, index + 4));
   }
-  day = Number(day);
-
-  //get year
-  index += 1;
-  year = Number(dateString.slice(index, index + 4));
 
   //set return object
   const returnObj = {
@@ -47,7 +85,7 @@ export const getHeaders = (data) => {
 
   const headersObject = headers.map((value, index) => {
     var returnObject = {
-      style: {width: 150, textAlign: 'left'},
+      style: { width: 150, textAlign: 'left' },
       key: value,
       name: value,
       numeric: false,
@@ -56,6 +94,7 @@ export const getHeaders = (data) => {
     if (value === "Category") {
       returnObject.theme = 'dropdown';
       returnObject.edit = true;
+      returnObject.options = categoryOptions;
     }
     if (value === "Credit" || value === "Debit") {
       returnObject.numeric = true;
