@@ -13,6 +13,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ViewTransactions from './ViewTransactions';
 import FileUpload from './FileUpload';
+import BudgetAnalysis from './BudgetAnalysis';
 import Home from './Home';
 
 const drawerWidth = 275;
@@ -109,11 +110,12 @@ export default function MiniDrawer() {
   const getContent = () => {
     switch( navSelect ) {
       case ('View Transaction Data'):  
-      	return(<ViewTransactions handleRedirect={handleMenuClick}/>);
+      	return(<ViewTransactions/>);
      	case ('Import Data'): 
         console.log('test');
-        return(<FileUpload handleRedirect={handleMenuClick}/>);
+        return(<FileUpload/>);
        case ('Analysis'):
+        return(<BudgetAnalysis/>)
       default:
         return(<Home/>);
     }
