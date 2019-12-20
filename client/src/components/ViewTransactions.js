@@ -12,11 +12,12 @@ class ViewTransactions extends Component {
   state = {
     loading: true,
     redirect: "",
-    data: [{ "Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate() }],
-    importData: [{ "Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate() }],
-    tableData: [{ "Transaction Date": new Date().getDate(), "Posted Date": new Date().getDate() }],
+    data: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
+    importData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
+    tableData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
     tableHeaders: [],
     dateRange: [new Date(0), new Date()],
+//     sliderInit: [new Date((new Date()).getTime()-(86400000 * 30)), new Date()], //start with last 30 days
     updateCategoryRows: [],
     editCategories: false,
   }
@@ -114,12 +115,14 @@ class ViewTransactions extends Component {
       dateRange,
       loading,
       editCategories,
+//       sliderInit
     } = this.state
+    console.log(loading);
     if (loading) {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
-            <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
+        		<Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={dateRange}/>
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
               <Loader />
             </div>
@@ -131,7 +134,7 @@ class ViewTransactions extends Component {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
-            <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} />
+        		<Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={dateRange}/>
             <DataTable edit={editCategories} categoryChange={this.updateCategory} data={tableData} headers={tableHeaders} />
             <Button onClick={this.handleRedirectImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
               Import New Data

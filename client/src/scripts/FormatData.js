@@ -147,6 +147,8 @@ export const getTextDate = (date) => {
 
 //set table data based on specified date range
 export const setTableData = (data, dateRange) => {
+  console.log(data);
+  console.log(dateRange);
   var filteredData = data.filter((entry) => {
     const checkDate = entry["Transaction Date"];
     const minTimeCorrection = 24 * 3600000;

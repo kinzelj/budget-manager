@@ -19,6 +19,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function RangeSlider(props) {
   const classes = useStyles();
+  const [value, setValue] = React.useState([props.sliderInit[0].getTime(),props.sliderInit[1].getTime()]);
+  
+
+  const handleUpdate = (event) => {
+    console.log('test');
+   props.handleUpdate({value}); 
+  }
   
   const getMin = () => {
     return props.dateRange[0].getTime()
@@ -67,14 +74,8 @@ export default function RangeSlider(props) {
     return textDate;
   }
 
-  const [value, setValue] = React.useState([props.dateRange[0].getTime(),props.dateRange[1].getTime()]);
   
-  // const getDatesCallback = React.useCallback(() => {
-  //   console.log('test');
-  //   setValue([ props.dateRange[0].getTime(), props.dateRange[1].getTime()]);
-  // }, [setValue, props]);
   
-  // React.useEffect(() => { getDatesCallback() }, [getDatesCallback]);
   
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -98,10 +99,6 @@ export default function RangeSlider(props) {
       const newValue = [value[0], newMax.getTime()];
       setValue(newValue);
   };
-  
-  const handleUpdate = (event) => {
-   props.handleUpdate({value}); 
-  }
   
   return (
     <div style={{minWidth: '683px', marginRight: '17px'}}>
@@ -141,7 +138,7 @@ export default function RangeSlider(props) {
 
           <Grid item>
            <Button onClick={handleUpdate} variant="contained" color="primary">
-            Update Table
+             {props.buttonText}
           </Button>
          </ Grid>
 

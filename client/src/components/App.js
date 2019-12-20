@@ -7,7 +7,7 @@ import NavBar from './NavBar';
 class App extends Component {
   render() {
     return (
-      <div className='main-div'>
+      <div className='main-div' >
       	<NavBar />
       </div>
     );

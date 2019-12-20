@@ -34,7 +34,7 @@ export default function DataTable(props) {
   const classes = styles();
 
   const getStyles = (header, type) => {
-    var headerStyle = { ...header.style };
+    var headerStyle = { ...header.style, backgroundColor: 'white' };
     if (type === 'headers') {
       const headerClasses = classes.headerStyles;
       if (header.theme) {
