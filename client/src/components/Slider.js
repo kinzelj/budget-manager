@@ -23,7 +23,6 @@ export default function RangeSlider(props) {
   
 
   const handleUpdate = (event) => {
-    console.log('test');
    props.handleUpdate({value}); 
   }
   

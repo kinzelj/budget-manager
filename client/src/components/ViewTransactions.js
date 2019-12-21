@@ -12,18 +12,29 @@ class ViewTransactions extends Component {
   state = {
     loading: true,
     redirect: "",
-    data: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
     importData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
     tableData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
+    sliderInit: [new Date((new Date()).getTime() - (86400000 * 30)), new Date()], //start with last 30 days
+    sliderRange: [],
     tableHeaders: [],
     dateRange: [new Date(0), new Date()],
-//     sliderInit: [new Date((new Date()).getTime()-(86400000 * 30)), new Date()], //start with last 30 days
     updateCategoryRows: [],
     editCategories: false,
+    refresh: false,
   }
 
   componentDidMount() {
-    this.getData()
+    //format data and set component state
+    const formattedData = FormatData.formatData(this.props.data);
+    const tableData = FormatData.setTableData(formattedData, this.state.sliderInit);
+    const headersObject = FormatData.getHeaders(this.props.data);
+    const dateRange = FormatData.getMinMaxDate(formattedData);
+    this.setState({
+      tableData: tableData,
+      dateRange: dateRange,
+      tableHeaders: headersObject,
+      loading: false
+    });
   }
 
   getData = async () => {
@@ -32,17 +43,23 @@ class ViewTransactions extends Component {
       await this.props.fetchData()
 
       //format data and set component state
-      const formattedData = FormatData.formatData(this.props.data, true);
-      const tableData = FormatData.setTableData(formattedData, FormatData.getMinMaxDate(formattedData));
+      const formattedData = FormatData.formatData(this.props.data);
+      let tableData= [];
+      if(this.state.refresh){
+        tableData = FormatData.setTableData(formattedData, this.state.sliderRange);
+      }
+      else {
+        tableData = FormatData.setTableData(formattedData, this.state.sliderInit);
+      }
       const headersObject = FormatData.getHeaders(this.props.data);
       const dateRange = FormatData.getMinMaxDate(formattedData);
       this.setState({
-        data: formattedData,
         tableData: tableData,
         dateRange: dateRange,
+        sliderInit: [new Date((new Date()).getTime() - (86400000 * 30)), new Date()], //start with last 30 days
         tableHeaders: headersObject,
         loading: false
-      },()=>{console.log(this.state.tableData)});
+      });
     }
     catch (err) { console.log("Unable to retrieve data -->" + err) };
   }
@@ -50,7 +67,8 @@ class ViewTransactions extends Component {
   handleDateUpdate = (dateRange) => {
     this.setState({ loading: true });
     this.setState({
-      tableData: FormatData.setTableData(this.state.data, dateRange.value),
+      sliderRange: dateRange.value,
+      tableData: FormatData.setTableData(FormatData.formatData(this.props.data), dateRange.value),
     }, () => { this.setState({ loading: false }) });
   }
 
@@ -73,20 +91,21 @@ class ViewTransactions extends Component {
 
   handleEditCategories = () => {
     this.setState({
-      editCategories: true, 
+      editCategories: true,
     });
   }
 
   handleSaveCategories = () => {
     this.setState({
       loading: true,
-      editCategories: false  
-    }, async () => { 
-      if(this.state.updateCategoryRows[0]){
+      refresh: true,
+      editCategories: false
+    }, async () => {
+      if (this.state.updateCategoryRows[0]) {
         await (ServerRoutes.updateCategories(this.state.updateCategoryRows));
         await (this.getData());
       }
-      this.setState({updateCategoryRows: [], loading: false});
+      this.setState({ updateCategoryRows: [], loading: false, refresh: false });
     })
   }
 
@@ -115,14 +134,13 @@ class ViewTransactions extends Component {
       dateRange,
       loading,
       editCategories,
-//       sliderInit
+      sliderInit
     } = this.state
-    console.log(loading);
     if (loading) {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
-        		<Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={dateRange}/>
+            <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
               <Loader />
             </div>
@@ -134,7 +152,7 @@ class ViewTransactions extends Component {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
-        		<Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={dateRange}/>
+            <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
             <DataTable edit={editCategories} categoryChange={this.updateCategory} data={tableData} headers={tableHeaders} />
             <Button onClick={this.handleRedirectImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
               Import New Data

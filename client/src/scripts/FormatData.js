@@ -26,7 +26,6 @@ const categoryOptions = [
 
 
 export const parseDate = (dateString) => {
-  console.log(dateString);
   var year = '';
   var month = '';
   var day = '';
@@ -147,8 +146,6 @@ export const getTextDate = (date) => {
 
 //set table data based on specified date range
 export const setTableData = (data, dateRange) => {
-  console.log(data);
-  console.log(dateRange);
   var filteredData = data.filter((entry) => {
     const checkDate = entry["Transaction Date"];
     const minTimeCorrection = 24 * 3600000;
@@ -173,20 +170,69 @@ export const setTableData = (data, dateRange) => {
   return tableData;
 }
 
-export const formatData = (data, mount) => {
+//set pie graph data based on specified date range
+export const setAnalysisData = (data, dateRange) => {
+  var filteredData = data.filter((entry) => {
+    const checkDate = entry["Transaction Date"];
+    const minTimeCorrection = 24 * 3600000;
+    if ((checkDate.getTime() + minTimeCorrection) <= dateRange[0]
+      || (checkDate.getTime()) > dateRange[1]) {
+      return false
+    }
+    else return true
+  })
+
+  const analysisData = filteredData.map((entry) => {
+    return {
+      id: entry.id,
+      Category: entry.Category,
+      Credit: Number(entry.Credit).toFixed(2),
+      Debit: Number(entry.Debit).toFixed(2),
+      Description: entry.Description,
+      "Posted Date": getTextDate(entry["Posted Date"]),
+      "Transaction Date": getTextDate(entry["Transaction Date"])
+    }
+  })
+  return analysisData;
+}
+
+function sort2DArrayBySecond(a, b) {
+  if (a[1] === b[1]) {
+    return 0;
+  }
+  else {
+    return (a[1] > b[1]) ? -1 : 1;
+  }
+}
+
+export const groupCategories = (data) => {
+
+  let graphValues = {};
+  data.map((entry) => {
+    if (entry.Category in graphValues) {
+      graphValues[entry.Category] += Number(entry.Debit);
+    }
+    else if (Number(entry.Debit) > 0) {
+      graphValues[entry.Category] = Number(entry.Debit);
+    }
+  });
+  graphValues = Object.entries(graphValues);
+  graphValues.sort(sort2DArrayBySecond);
+  console.log(graphValues);
+  const graphData = graphValues.map((category) => {
+    return { name: category[0], value: category[1] }
+  })
+  return graphData;
+}
+
+export const formatData = (data) => {
   const formattedData = data.map((entry, index) => {
     var newPostDate = {};
     var newTransactionDate = {};
-    if (mount) {
-      newPostDate = new Date(entry["Posted Date"]);
-      newTransactionDate = new Date(entry["Transaction Date"]);
-    }
-    else {
-      const postedDateObj = parseDate(entry["Posted Date"]);
-      const transactionDateObj = parseDate(entry["Transaction Date"]);
-      newPostDate = new Date(Date.UTC(postedDateObj.year, (postedDateObj.month - 1), postedDateObj.day));
-      newTransactionDate = new Date(Date.UTC(transactionDateObj.year, (transactionDateObj.month - 1), transactionDateObj.day));
-    }
+    const postedDateObj = parseDate(entry["Posted Date"]);
+    const transactionDateObj = parseDate(entry["Transaction Date"]);
+    newPostDate = new Date(Date.UTC(postedDateObj.year, (postedDateObj.month - 1), postedDateObj.day));
+    newTransactionDate = new Date(Date.UTC(transactionDateObj.year, (transactionDateObj.month - 1), transactionDateObj.day));
     return {
       id: entry._id,
       Category: entry.Category,

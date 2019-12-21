@@ -25,18 +25,30 @@ const styles = () => ({
     currency: {
       textAlign: 'right',
     },
-  }
+  },
+
+  // bumpScrollWidth: {
+  //   scrollWidth: '17px'
+  // },
 
 });
 
 
-export default function DataTable(props) {
-  const classes = styles();
+export default class DataTable extends React.Component {
+  constructor(props) {
+    super(props);
+    this.classes = styles();
+    // this.checkScrollRef = React.createRef();
+    // this.maxTableHeight = 700;
+    // this.state = {
+    // adjustTableMargin: false
+    // }
+  }
 
-  const getStyles = (header, type) => {
+  getStyles = (header, type) => {
     var headerStyle = { ...header.style, backgroundColor: 'white' };
     if (type === 'headers') {
-      const headerClasses = classes.headerStyles;
+      const headerClasses = this.classes.headerStyles;
       if (header.theme) {
         for (const addStyle of Object.keys(headerClasses[header.theme])) {
           headerStyle[addStyle] = headerClasses[header.theme][addStyle];
@@ -49,7 +61,7 @@ export default function DataTable(props) {
       }
     }
     if (type === 'body') {
-      const bodyClasses = classes.bodyStyles;
+      const bodyClasses = this.classes.bodyStyles;
       if (header.theme) {
         for (const addStyle of Object.keys(bodyClasses[header.theme])) {
           headerStyle[addStyle] = bodyClasses[header.theme][addStyle];
@@ -64,18 +76,18 @@ export default function DataTable(props) {
     return headerStyle;
   }
 
-  function handleCategoryChange(event, index) {
-    props.categoryChange(event.target.value, event.target.id, index);
+  handleCategoryChange = (event, index) => {
+    this.props.categoryChange(event.target.value, event.target.id, index);
   }
 
-  const getCellContents = (row, header, index) => {
+  getCellContents = (row, header, index) => {
     const value = row[header.name];
     if (header.theme === 'currency' && value.toString() === '0.00') {
       return '';
     }
 
     //dropdown cell content
-    else if (header.theme === 'dropdown' && props.edit === true) {
+    else if (header.theme === 'dropdown' && this.props.edit === true) {
       const getOptions = () => {
         const optionsJSX = header.options.map((option, index) => {
           return (
@@ -86,19 +98,19 @@ export default function DataTable(props) {
       }
       const dropdownJSX = () => {
         return (
-          <select 
-            className="cell-select" 
-            key={"select"+ index}
-            id={row.id} 
+          <select
+            className="cell-select"
+            key={"select" + index}
+            id={row.id}
             value={value}
-            onChange={(e)=>{handleCategoryChange(e, index)}}
+            onChange={(e) => { this.handleCategoryChange(e, index) }}
           >{getOptions()}</select>
         );
 
       }
       const selectReturn = dropdownJSX();
       return selectReturn;
-      
+
     }
 
     //default cell content
@@ -107,11 +119,11 @@ export default function DataTable(props) {
     }
   }
 
-  const renderTableHeader = (headerData) => {
+  renderTableHeader = (headerData) => {
     const headersJSX = headerData.map((header) => {
 
       //add theme style to value style object or set default style
-      var headerStyle = getStyles(header, 'headers');
+      var headerStyle = this.getStyles(header, 'headers');
 
       return (
         <th key={header.key} style={headerStyle}>
@@ -122,15 +134,15 @@ export default function DataTable(props) {
     return <tr className='header-cell'>{headersJSX}</tr>
   }
 
-  const renderTableData = (headers, data) => {
+  renderTableData = (headers, data) => {
     const tableJSX = data.map((row, index) => {
       const rowJSX = headers.map((header, i) => {
         const cellKey = header.name + index;
 
         //add theme style to value style object or set default style
-        var headerStyle = getStyles(header, 'body');
+        var headerStyle = this.getStyles(header, 'body');
 
-        var displayContents = getCellContents(row, header, index);
+        var displayContents = this.getCellContents(row, header, index);
 
 
         return (
@@ -145,22 +157,44 @@ export default function DataTable(props) {
     return tableJSX;
   }
 
-  return (
-    <div className='data-table'>
-      <div className='table-head-div'>
-        <table className='table-head' cellPadding="0" cellSpacing="0" border="0">
-          <thead>
-            {renderTableHeader(props.headers)}
-          </thead>
-        </table>
+  // componentDidMount() {
+  //   const nodeStyle = window.getComputedStyle(this.checkScrollRef.current);
+  //   const tableHeight = Number(nodeStyle.height.slice(0, nodeStyle.height.length - 2));
+  //   if (tableHeight >= this.maxTableHeight) {
+  //     this.setState({
+  //       adjustTableMargin: true
+  //     },()=>{console.log(this.state)});
+  //   }
+  // }
+
+  // getHeaderStyle = () => {
+  //   if (this.state.adjustTableMargin) {
+  //     return (
+  //       { marginRight: this.classes.bumpScrollWidth.scrollWidth }
+  //     );
+  //   }
+  // }
+
+  render() {
+    return (
+      <div className='data-table'>
+        {/* <div className='table-head-div' style={this.getHeaderStyle()}> */}
+        <div className='table-head-div'>
+          <table className='table-head' cellPadding="0" cellSpacing="0" border="0">
+            <thead>
+              {this.renderTableHeader(this.props.headers)}
+            </thead>
+          </table>
+        </div>
+        {/* <div className='table-body-div' ref={this.checkScrollRef} > */}
+        <div className='table-body-div' >
+          <table className='table-body' cellPadding="0" cellSpacing="0" border="0">
+            <tbody>
+              {this.renderTableData(this.props.headers, this.props.data)}
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div className='table-body-div'>
-        <table className='table-body' cellPadding="0" cellSpacing="0" border="0">
-          <tbody>
-            {renderTableData(props.headers, props.data)}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
+    )
+  }
 }

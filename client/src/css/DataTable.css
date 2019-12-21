@@ -15,7 +15,7 @@
 }
 
 .table-body-div {
-  overflow-y: auto;
+  overflow-y: scroll;
   max-height: var(--max-table-height);
 }
 

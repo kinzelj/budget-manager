@@ -1,54 +1,30 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PieChart from './PieChart.js'
 import Slider from './Slider.js'
+import * as FormatData from '../scripts/FormatData.js';
 
-const data = [
-  {
-    "name": "Group A",
-    "value": 400
-  },
-  {
-    "name": "Group B",
-    "value": 350
-  },
-  {
-    "name": "Group C",
-    "value": 300
-  },
-  {
-    "name": "Group D",
-    "value": 278
-  },
-  {
-    "name": "Group E",
-    "value": 200
-  },
-  {
-    "name": "Group F",
-    "value": 189
-  },
-  {
-    "name": "Group G",
-    "value": 89
-  },
-  {
-    "name": "Group H",
-    "value": 19
-  }
-];
-
-export default class BudgetAnalysis extends Component {
-  state = {
-    dateRange: [new Date(0), new Date()],
-    loading: false,
-    sliderInit: [new Date((new Date()).getTime()-(86400000 * 30)), new Date()], //start with last 30 days
-//     sliderInit: [new Date((new Date()).getDate()-(86400000 * 30)), new Date()], //start with last 30 days
+class BudgetAnalysis extends Component {
+  constructor(props) {
+    super(props);
+    this.formattedData = FormatData.formatData(this.props.data);
+    this.dateRange = FormatData.getMinMaxDate(this.formattedData);
+    this.sliderInit = [new Date((new Date()).getTime() - (86400000 * 30)), new Date()]; //start with last 30 days
+    this.analysisDataStart = FormatData.setAnalysisData(this.formattedData, this.sliderInit);
+    this.graphDataStart = FormatData.groupCategories(this.analysisDataStart); 
+    console.log(this.graphDataStart);
+    this.state = {
+      sliderInit: this.sliderInit,
+      dateRange: this.dateRange,
+      loading: false,
+      analysisData: this.analysisDataStart,
+      graphData: this.graphDataStart,
+    }
   }
 
-	handleDateUpdate = (dateRange) => {
+  handleDateUpdate = (dateRange) => {
     this.setState({ loading: true });
     this.setState({
-//       tableData: FormatData.setTableData(this.state.data, dateRange.value),
     }, () => { this.setState({ loading: false }) });
   }
 
@@ -56,14 +32,19 @@ export default class BudgetAnalysis extends Component {
     const {
       dateRange,
       loading,
-      sliderInit
+      sliderInit,
+      graphData
     } = this.state
-    
-    return(
-      <div style={{width: '50%'}}>
+    return (
+      <div style={{ width: '50%' }}>
         <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Analysis"} sliderInit={sliderInit} />
-        <PieChart data={data}/>
+        <PieChart data={graphData} />
       </div>
     );
   }
 }
+
+function mapStateToProps(state) {
+  return { data: state.data }
+}
+export default connect(mapStateToProps)(BudgetAnalysis)

@@ -52,7 +52,8 @@ class FileUpload extends Component {
         await this.getData();
         //route to ViewTransactions page
         this.setState({ loading: false }, () => {
-          this.props.handleRedirect({ text: 'View Transaction Data' });
+          console.log('test');
+          this.props.handleRedirect('View Transaction Data');
         });
       }
       catch (err) { alert("Unable to import data -->" + err) }
@@ -67,8 +68,6 @@ class FileUpload extends Component {
     var res = {};
     try { res = await ServerRoutes.convertData(dataFileToSend) }
     catch (err) { alert("Unable to import data -->" + err) }
-
-    console.log(res);
 
     const headersObject = FormatData.getHeaders(res);
     const formattedData = FormatData.formatData(res, false);
