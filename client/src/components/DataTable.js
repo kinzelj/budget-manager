@@ -134,7 +134,7 @@ export default class DataTable extends React.Component {
       //add theme style to value style object or set default style
       var headerStyle = this.getStyles(header, 'headers');
 
-      if (header.filter === true) {
+      if (header.filter === true && this.props.filter === true) {
         return (
           <th key={header.key} style={headerStyle}>
             <select

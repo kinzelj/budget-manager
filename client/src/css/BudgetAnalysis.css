@@ -1,3 +1,8 @@
+:root {
+  --max-table-height: 520px;  
+}
+
+
 @media only screen and (max-width: 1825px) {
     .column-table{
         min-width: var(--min-table-width);
@@ -13,4 +18,9 @@
         padding: 1rem 1rem!important;
     }
 } 
+
+.table-body-div {
+  overflow-y: scroll;
+  max-height: var(--max-table-height);
+}
 

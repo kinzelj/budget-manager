@@ -3,8 +3,10 @@ const categoryOptions = [
   { id: "Car Rental", value: "Car Rental" },
   { id: "Car Expense", value: "Car Expense" },
   { id: "Dining", value: "Dining" },
+  { id: "Donation", value: "Donation" },
   { id: "Education", value: "Education" },
   { id: "Entertainment", value: "Entertainment" },
+  { id: "Fee/Interest Charge", value: "Fee/Interest Charge" },
   { id: "Gas/Automotive", value: "Gas/Automotive" },
   { id: "Groceries", value: "Groceries" },
   { id: "Health Care", value: "Health Care" },
@@ -209,12 +211,21 @@ export const setAnalysisData = (data, dateRange) => {
   return analysisData;
 }
 
-function sort2DArrayBySecond(a, b) {
+export const sortCategoryCosts = (a, b) => {
   if (a[1] === b[1]) {
     return 0;
   }
   else {
     return (a[1] > b[1]) ? -1 : 1;
+  }
+}
+
+export const sortTableCosts = (a, b) => {
+  if (Number(a['Debit']) === Number(b['Debit'])) {
+    return 0;
+  }
+  else {
+    return (Number(a['Debit']) > Number(b['Debit'])) ? -1 : 1;
   }
 }
 
@@ -239,7 +250,7 @@ export const groupCategories = (data) => {
     }
   }
   graphValues = Object.entries(graphValues);
-  graphValues.sort(sort2DArrayBySecond);
+  graphValues.sort(sortCategoryCosts);
   const graphData = graphValues.map((category) => {
     return { name: category[0], value: category[1] }
   })

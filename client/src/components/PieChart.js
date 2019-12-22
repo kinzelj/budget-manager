@@ -39,13 +39,13 @@ const renderActiveShape = (props) => {
         outerRadius={outerRadius + 10}
         fill={fill}
       />
-      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
-      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
+      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
+      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
       {/* <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{name}</text> */}
       <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#333">
-				{`Total: $${value.toFixed(2)}`}
-			</text>
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={2*18} textAnchor={textAnchor} fill="#999">
+        {`Total: $${value.toFixed(2)}`}
+      </text>
+      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={2 * 18} textAnchor={textAnchor} fill="#999">
         {`(${(percent * 100).toFixed(2)}%)`}
       </text>
     </g>
@@ -55,10 +55,10 @@ const renderActiveShape = (props) => {
 export default function PieGraph(props) {
   const data = props.data;
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const [chartColors, setChartColors] = React.useState(data.map((value,index)=>{ return colors[index] }));
+  const [chartColors, setChartColors] = React.useState(data.map((value, index) => { return colors[index] }));
 
   const getColors = (data) => {
-    const newColors =  data.map((value, index)=>{ return colors[index] })
+    const newColors = data.map((value, index) => { return colors[index] })
     setChartColors(newColors);
   }
 
@@ -67,39 +67,39 @@ export default function PieGraph(props) {
   }, [data])
 
   const chartClick = (event) => {
-   console.log(event); 
+    props.handleClick(event.name);
   }
-  
+
   const onPieEnter = (data, index) => { setActiveIndex(index) }
-    
+
   return (
     <div>
-    	<PieChart width={props.minWidth} height={500}>
-        <Pie 
-   					activeIndex={activeIndex}
-            activeShape={renderActiveShape}  
-            onMouseEnter={onPieEnter} 
-            onClick={chartClick} 
-            data={data} 
-            dataKey="value" 
-            nameKey="name" 
-            cx="45%" 
-            cy="50%" 
-            outerRadius={150} 
-            innerRadius={100} 
-    			>
+      <PieChart width={props.minWidth} height={500}>
+        <Pie
+          activeIndex={activeIndex}
+          activeShape={renderActiveShape}
+          onMouseEnter={onPieEnter}
+          onClick={chartClick}
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          cx="45%"
+          cy="50%"
+          outerRadius={150}
+          innerRadius={100}
+        >
           {
             data.map((entry, index) => (
               <Cell dataKey="value" key={`cell-${index}`} fill={chartColors[index]} />
             ))
           }
-				</Pie >
+        </Pie >
       </PieChart>
     </div>
   );
 }
 
 
-    
-  
-                            
+
+
+

@@ -11,7 +11,8 @@ import * as actions from '../redux/actions.js';
 class ViewTransactions extends Component {
   constructor(props) {
     super(props);
-    this.tableStart = 90 //number of days to show as default table date range
+    this.tableStart = 90; //number of days to show as default table date range
+    this.filterCategories = true;
     this.state = {
       loading: true,
       redirect: "",
@@ -98,7 +99,6 @@ class ViewTransactions extends Component {
     const tableData = FormatData.setTableData(formattedData, this.state.sliderRange)
     const filteredTable = FormatData.filterTable(tableData, filterCategory);
     this.setState({tableData: filteredTable});
-    
   }
 
   handleEditCategories = () => {
@@ -170,6 +170,7 @@ class ViewTransactions extends Component {
             <DataTable
               filterChange={this.handleCategoryFilter}
               edit={editCategories}
+              filter={this.filterCategories}
               categoryChange={this.updateCategory}
               data={tableData}
               headers={tableHeaders} />
