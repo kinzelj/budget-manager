@@ -40,9 +40,9 @@ export default class DataTable extends React.Component {
     this.classes = styles();
     // this.checkScrollRef = React.createRef();
     // this.maxTableHeight = 700;
-    // this.state = {
-    // adjustTableMargin: false
-    // }
+    this.state = {
+      filterSelect: "All Categories"
+    }
   }
 
   getStyles = (header, type) => {
@@ -79,6 +79,16 @@ export default class DataTable extends React.Component {
   handleCategoryChange = (event, index) => {
     this.props.categoryChange(event.target.value, event.target.id, index);
   }
+  
+
+  getOptions = (header, checkHeader) => {
+    const optionsJSX = header.options.map((option, index) => {
+      return (
+        <option key={option.value + index} value={option.value}>{option.value}</option>
+      )
+    })
+    return optionsJSX;
+  }
 
   getCellContents = (row, header, index) => {
     const value = row[header.name];
@@ -88,14 +98,7 @@ export default class DataTable extends React.Component {
 
     //dropdown cell content
     else if (header.theme === 'dropdown' && this.props.edit === true) {
-      const getOptions = () => {
-        const optionsJSX = header.options.map((option, index) => {
-          return (
-            <option key={option.value + index} value={option.value}>{option.value}</option>
-          )
-        })
-        return optionsJSX;
-      }
+
       const dropdownJSX = () => {
         return (
           <select
@@ -104,7 +107,7 @@ export default class DataTable extends React.Component {
             id={row.id}
             value={value}
             onChange={(e) => { this.handleCategoryChange(e, index) }}
-          >{getOptions()}</select>
+          >{this.getOptions(header)}</select>
         );
 
       }
@@ -119,17 +122,37 @@ export default class DataTable extends React.Component {
     }
   }
 
+  handleFilterChange = (event) => {
+    const categorySelect = event.target.value;
+    this.setState({filterSelect: categorySelect}, () => {
+      this.props.filterChange(this.state.filterSelect);
+    })
+  }
   renderTableHeader = (headerData) => {
     const headersJSX = headerData.map((header) => {
 
       //add theme style to value style object or set default style
       var headerStyle = this.getStyles(header, 'headers');
 
-      return (
-        <th key={header.key} style={headerStyle}>
-          {header.name}
-        </th>
-      )
+      if (header.filter === true) {
+        return (
+          <th key={header.key} style={headerStyle}>
+            <select
+              className="table-filter"
+              key={"filter_" + header.name}
+              value={this.state.filterSelect}
+              onChange={(e) => { this.handleFilterChange(e) }}
+            >{this.getOptions(header)}</select>
+          </th>
+        )
+      }
+      else {
+        return (
+          <th key={header.key} style={headerStyle}>
+            {header.name}
+          </th>
+        )
+      }
     })
     return <tr className='header-cell'>{headersJSX}</tr>
   }

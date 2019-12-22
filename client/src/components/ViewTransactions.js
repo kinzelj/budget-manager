@@ -17,7 +17,7 @@ class ViewTransactions extends Component {
       redirect: "",
       importData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
       tableData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
-      sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()], 
+      sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()],
       sliderRange: [],
       tableHeaders: [],
       dateRange: [new Date(0), new Date()],
@@ -48,8 +48,8 @@ class ViewTransactions extends Component {
 
       //format data and set component state
       const formattedData = FormatData.formatData(this.props.data);
-      let tableData= [];
-      if(this.state.refresh){
+      let tableData = [];
+      if (this.state.refresh) {
         tableData = FormatData.setTableData(formattedData, this.state.sliderRange);
       }
       else {
@@ -60,7 +60,7 @@ class ViewTransactions extends Component {
       this.setState({
         tableData: tableData,
         dateRange: dateRange,
-        sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()], 
+        sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()],
         tableHeaders: headersObject,
         loading: false
       });
@@ -93,6 +93,14 @@ class ViewTransactions extends Component {
     });
   }
 
+  handleCategoryFilter = (filterCategory) => {
+    const formattedData = FormatData.formatData(this.props.data);
+    const tableData = FormatData.setTableData(formattedData, this.state.sliderRange)
+    const filteredTable = FormatData.filterTable(tableData, filterCategory);
+    this.setState({tableData: filteredTable});
+    
+  }
+
   handleEditCategories = () => {
     this.setState({
       editCategories: true,
@@ -112,6 +120,8 @@ class ViewTransactions extends Component {
       this.setState({ updateCategoryRows: [], loading: false, refresh: false });
     })
   }
+
+  
 
   getEditButton = () => {
     if (this.state.editCategories) {
@@ -157,7 +167,12 @@ class ViewTransactions extends Component {
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px' }}>
             <Slider minWidth='683px' handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
-            <DataTable edit={editCategories} categoryChange={this.updateCategory} data={tableData} headers={tableHeaders} />
+            <DataTable
+              filterChange={this.handleCategoryFilter}
+              edit={editCategories}
+              categoryChange={this.updateCategory}
+              data={tableData}
+              headers={tableHeaders} />
             <Button onClick={this.handleRedirectImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
               Import New Data
             </Button>

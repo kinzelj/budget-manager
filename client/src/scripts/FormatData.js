@@ -89,11 +89,13 @@ export const getHeaders = (data) => {
       name: value,
       numeric: false,
       edit: false,
+      filter: false,
     }
     if (value === "Category") {
       returnObject.theme = 'dropdown';
       returnObject.edit = true;
-      returnObject.options = categoryOptions;
+      returnObject.filter = true;
+      returnObject.options = [{id: "All Categories", value: "All Categories"},...categoryOptions];
     }
     if (value === "Credit" || value === "Debit") {
       returnObject.numeric = true;
@@ -109,6 +111,7 @@ export const getHeaders = (data) => {
   return headersObject;
 
 }
+
 
 //get min and max dates of data passed to function
 export const getMinMaxDate = (data) => {
@@ -170,6 +173,16 @@ export const setTableData = (data, dateRange) => {
   return tableData;
 }
 
+export const filterTable = (data, filterValue) => {
+  let filteredData = data;
+  if (filterValue !== "All Categories") {
+    filteredData = data.filter((entry) => {
+      return entry.Category === filterValue; 
+    })
+  }
+  return filteredData;
+}
+
 //set pie graph data based on specified date range
 export const setAnalysisData = (data, dateRange) => {
   var filteredData = data.filter((entry) => {
@@ -209,10 +222,20 @@ export const groupCategories = (data) => {
   let graphValues = {};
   for (const index in data) {
     if (data[index]['Category'] in graphValues) {
-      graphValues[data[index]['Category']] += Number(data[index]['Debit']);
+      if (Number(data[index]['Debit']) > 0) {
+        graphValues[data[index]['Category']] += Number(data[index]['Debit']);
+      }
+      else if (Number(data[index]['Credit']) > 0) {
+        graphValues[data[index]['Category']] -= Number(data[index]['Credit']);
+      }
     }
-    else if (Number(data[index]['Debit']) > 0) {
-      graphValues[data[index]['Category']] = Number(data[index]['Debit']);
+    else if (data[index]['Category'] !== "Payment/Credit") {
+      if (Number(data[index]['Debit']) > 0) {
+        graphValues[data[index]['Category']] = Number(data[index]['Debit']);
+      }
+      else if (Number(data[index]['Credit']) > 0) {
+        graphValues[data[index]['Category']] = Number(data[index]['Credit'])*-1;
+      }
     }
   }
   graphValues = Object.entries(graphValues);

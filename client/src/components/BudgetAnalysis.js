@@ -54,7 +54,6 @@ class BudgetAnalysis extends Component {
     } = this.state
     const graphStyle = this.colStyle.graphStyle;
     const tableStyle = this.colStyle.tableStyle;
-    console.log(tableStyle);
     return (
       <div className='ui stackable two column grid first-row'>
         <div className="six wide column column-graph">
