@@ -101,7 +101,7 @@ class FileUpload extends Component {
     }
     else if (dataLoaded) {
       return (
-        <div className='file-upload' style={{ maxWidth: '930px', margin: 'auto' }}>
+        <div className='file-upload' style={{ maxWidth: '930px'}}>
           <div>
             <input type="file" className="file" onChange={this.handleChangeFile} /> <br />
           </div>
@@ -116,7 +116,7 @@ class FileUpload extends Component {
     }
     else {
       return (
-        <div className='file-upload' style={{ maxWidth: '930px', margin: 'auto' }}>
+        <div className='file-upload' style={{ maxWidth: '930px' }}>
           <div>
             <input type="file" className="file" onChange={this.handleChangeFile} /> <br />
           </div>

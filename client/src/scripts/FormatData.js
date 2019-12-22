@@ -206,19 +206,17 @@ function sort2DArrayBySecond(a, b) {
 }
 
 export const groupCategories = (data) => {
-
   let graphValues = {};
-  data.map((entry) => {
-    if (entry.Category in graphValues) {
-      graphValues[entry.Category] += Number(entry.Debit);
+  for (const index in data) {
+    if (data[index]['Category'] in graphValues) {
+      graphValues[data[index]['Category']] += Number(data[index]['Debit']);
     }
-    else if (Number(entry.Debit) > 0) {
-      graphValues[entry.Category] = Number(entry.Debit);
+    else if (Number(data[index]['Debit']) > 0) {
+      graphValues[data[index]['Category']] = Number(data[index]['Debit']);
     }
-  });
+  }
   graphValues = Object.entries(graphValues);
   graphValues.sort(sort2DArrayBySecond);
-  console.log(graphValues);
   const graphData = graphValues.map((category) => {
     return { name: category[0], value: category[1] }
   })

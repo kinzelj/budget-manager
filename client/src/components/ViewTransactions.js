@@ -9,18 +9,22 @@ import * as ServerRoutes from '../routes/ServerRoutes.js';
 import * as actions from '../redux/actions.js';
 
 class ViewTransactions extends Component {
-  state = {
-    loading: true,
-    redirect: "",
-    importData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
-    tableData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
-    sliderInit: [new Date((new Date()).getTime() - (86400000 * 30)), new Date()], //start with last 30 days
-    sliderRange: [],
-    tableHeaders: [],
-    dateRange: [new Date(0), new Date()],
-    updateCategoryRows: [],
-    editCategories: false,
-    refresh: false,
+  constructor(props) {
+    super(props);
+    this.tableStart = 90 //number of days to show as default table date range
+    this.state = {
+      loading: true,
+      redirect: "",
+      importData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
+      tableData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
+      sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()], 
+      sliderRange: [],
+      tableHeaders: [],
+      dateRange: [new Date(0), new Date()],
+      updateCategoryRows: [],
+      editCategories: false,
+      refresh: false,
+    }
   }
 
   componentDidMount() {
@@ -56,7 +60,7 @@ class ViewTransactions extends Component {
       this.setState({
         tableData: tableData,
         dateRange: dateRange,
-        sliderInit: [new Date((new Date()).getTime() - (86400000 * 30)), new Date()], //start with last 30 days
+        sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()], 
         tableHeaders: headersObject,
         loading: false
       });
@@ -73,7 +77,7 @@ class ViewTransactions extends Component {
   }
 
   handleRedirectImport = () => {
-    this.props.handleRedirect('Import Data');
+    this.props.handleRedirect('Import Transaction Data');
   }
 
   updateCategory = (newCategory, id, index) => {
@@ -139,8 +143,8 @@ class ViewTransactions extends Component {
     if (loading) {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
-          <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
-            <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
+          <div className='table-slider' style={{ maxWidth: '930px' }}>
+            <Slider minWidth='683px' handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
               <Loader />
             </div>
@@ -151,8 +155,8 @@ class ViewTransactions extends Component {
     else {
       return (
         <div className="app" style={{ width: '90%', margin: 'auto' }}>
-          <div className='table-slider' style={{ maxWidth: '930px', margin: 'auto' }}>
-            <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
+          <div className='table-slider' style={{ maxWidth: '930px' }}>
+            <Slider minWidth='683px' handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
             <DataTable edit={editCategories} categoryChange={this.updateCategory} data={tableData} headers={tableHeaders} />
             <Button onClick={this.handleRedirectImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
               Import New Data

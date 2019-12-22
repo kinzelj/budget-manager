@@ -100,7 +100,7 @@ export default function RangeSlider(props) {
   };
   
   return (
-    <div style={{minWidth: '683px', marginRight: '17px'}}>
+    <div style={{minWidth: props.minWidth, marginRight: '17px'}}>
     	<Grid container spacing={2} alignItems="center">
           <Grid item xs>
             <Slider
@@ -108,6 +108,7 @@ export default function RangeSlider(props) {
             onChange={handleChange}
             valueLabelDisplay="off"
             aria-labelledby="range-slider"
+            style={{minWidth: '60px'}}
             min={getMin()}
             max={getMax()}
           />
