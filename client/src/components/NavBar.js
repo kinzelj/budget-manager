@@ -83,8 +83,9 @@ const getNavOptions = () => ({
   options: [
   	{ text: "Home", icon: "large home icon"},
   	{ text: "View Transaction Data", icon: "large database icon"},
-  	{ text: "Import Transaction Data", icon: "large upload icon"},
   	{ text: "Analysis", icon: "large table icon"},
+  	{ text: "Import Transaction Data", icon: "large upload icon"},
+  	{ text: "Budget Input Settings", icon: "large cog icon"},
   ]
 })
 
@@ -111,10 +112,10 @@ export default function MiniDrawer() {
     switch( navSelect ) {
       case ('View Transaction Data'):  
       	return(<ViewTransactions handleRedirect={handleMenuClick}/>);
-     	case ('Import Transaction Data'): 
-        return(<FileUpload handleRedirect={handleMenuClick}/>);
-       case ('Analysis'):
+      case ('Analysis'):
         return(<BudgetAnalysis/>)
+      case ('Import Transaction Data'): 
+        return(<FileUpload handleRedirect={handleMenuClick}/>);
       default:
         return(<Home/>);
     }

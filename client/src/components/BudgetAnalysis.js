@@ -29,7 +29,7 @@ class BudgetAnalysis extends Component {
       dateRange: FormatData.getMinMaxDate(this.formattedData),
       analysisData: this.analysisDataStart,
       graphData: this.graphDataStart,
-      tableHeaders: FormatData.getHeaders(this.props.data),
+      tableHeaders: FormatData.getHeaders(this.analysisDataStart),
       tableData: this.analysisDataStart,
     }
   }
@@ -47,7 +47,7 @@ class BudgetAnalysis extends Component {
   }
 
   handleCategoryFilter = (filterCategory) => {
-    const filteredTable = FormatData.filterTable(this.state.analysisData, filterCategory);
+    const filteredTable = FormatData.filterCategories(this.state.analysisData, filterCategory);
     this.setState({tableData: filteredTable.sort(FormatData.sortTableCosts)});
   }
 

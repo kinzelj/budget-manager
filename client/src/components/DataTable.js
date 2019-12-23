@@ -41,7 +41,8 @@ export default class DataTable extends React.Component {
     // this.checkScrollRef = React.createRef();
     // this.maxTableHeight = 700;
     this.state = {
-      filterSelect: "All Categories"
+      filterSelect: "All Categories",
+      filterClass: "",
     }
   }
 
@@ -123,11 +124,13 @@ export default class DataTable extends React.Component {
   }
 
   handleFilterChange = (event) => {
-    const categorySelect = event.target.value;
-    this.setState({filterSelect: categorySelect}, () => {
-      this.props.filterChange(this.state.filterSelect);
+    const filterSelect = event.target.value;
+    const filterClass = event.target.getAttributeNode('class');
+    this.setState({filterSelect: filterSelect, filterClass: filterClass}, () => {
+      this.props.filterChange(this.state.filterSelect, this.state.filterClass);
     })
   }
+  
   renderTableHeader = (headerData) => {
     const headersJSX = headerData.map((header) => {
 
@@ -138,7 +141,7 @@ export default class DataTable extends React.Component {
         return (
           <th key={header.key} style={headerStyle}>
             <select
-              className="table-filter"
+              className={header.className}
               key={"filter_" + header.name}
               value={this.state.filterSelect}
               onChange={(e) => { this.handleFilterChange(e) }}

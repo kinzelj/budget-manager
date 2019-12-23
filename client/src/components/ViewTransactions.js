@@ -18,6 +18,7 @@ class ViewTransactions extends Component {
       redirect: "",
       importData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
       tableData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
+      categoryData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
       sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()],
       sliderRange: [],
       tableHeaders: [],
@@ -32,12 +33,11 @@ class ViewTransactions extends Component {
     //format data and set component state
     const formattedData = FormatData.formatData(this.props.data);
     const tableData = FormatData.setTableData(formattedData, this.state.sliderInit);
-    const headersObject = FormatData.getHeaders(this.props.data);
     const dateRange = FormatData.getMinMaxDate(formattedData);
     this.setState({
       tableData: tableData,
       dateRange: dateRange,
-      tableHeaders: headersObject,
+      tableHeaders: FormatData.getHeaders(tableData),
       loading: false
     });
   }
@@ -56,13 +56,12 @@ class ViewTransactions extends Component {
       else {
         tableData = FormatData.setTableData(formattedData, this.state.sliderInit);
       }
-      const headersObject = FormatData.getHeaders(this.props.data);
       const dateRange = FormatData.getMinMaxDate(formattedData);
       this.setState({
         tableData: tableData,
         dateRange: dateRange,
         sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()],
-        tableHeaders: headersObject,
+      	tableHeaders: FormatData.getHeaders(tableData),
         loading: false
       });
     }
@@ -71,9 +70,12 @@ class ViewTransactions extends Component {
 
   handleDateUpdate = (dateRange) => {
     this.setState({ loading: true });
+    const formattedData = FormatData.formatData(this.props.data);
+    const tableData = FormatData.setTableData(formattedData, dateRange.value)
     this.setState({
       sliderRange: dateRange.value,
-      tableData: FormatData.setTableData(FormatData.formatData(this.props.data), dateRange.value),
+      tableData: tableData,
+      tableHeaders: FormatData.getHeaders(tableData),
     }, () => { this.setState({ loading: false }) });
   }
 
@@ -94,11 +96,31 @@ class ViewTransactions extends Component {
     });
   }
 
-  handleCategoryFilter = (filterCategory) => {
-    const formattedData = FormatData.formatData(this.props.data);
-    const tableData = FormatData.setTableData(formattedData, this.state.sliderRange)
-    const filteredTable = FormatData.filterTable(tableData, filterCategory);
-    this.setState({tableData: filteredTable});
+  handleFilter = (filterCategory, filterClass) => {
+    switch (filterClass.value) {
+      case ('category'):{
+    		const formattedData = FormatData.formatData(this.props.data);
+    		const tableData = FormatData.setTableData(formattedData, this.state.sliderRange)
+        const categoryData = FormatData.filterCategories(tableData, filterCategory);
+        this.setState({
+          tableData: categoryData,
+          categoryData: categoryData,
+      		tableHeaders: FormatData.getHeaders(categoryData),
+        });
+        break;
+      }
+      case ('description'): {
+        console.log(this.state);
+        const filteredTable = FormatData.filterDescriptions(this.state.categoryData, filterCategory);
+        this.setState({
+          tableData: filteredTable,
+        });     
+        break;
+      }
+      default:
+        return;
+    }
+    
   }
 
   handleEditCategories = () => {
@@ -168,7 +190,7 @@ class ViewTransactions extends Component {
           <div className='table-slider' style={{ maxWidth: '930px' }}>
             <Slider minWidth='683px' handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
             <DataTable
-              filterChange={this.handleCategoryFilter}
+              filterChange={this.handleFilter}
               edit={editCategories}
               filter={this.filterCategories}
               categoryChange={this.updateCategory}
