@@ -70,6 +70,7 @@ class FileUpload extends Component {
     catch (err) { alert("Unable to import data -->" + err) }
 
     const headersObject = FormatData.getHeaders(res);
+    console.log(headersObject);
     const formattedData = FormatData.formatData(res, false);
     const dateRange = FormatData.getMinMaxDate(formattedData);
 

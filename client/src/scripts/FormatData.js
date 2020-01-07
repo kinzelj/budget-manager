@@ -78,7 +78,7 @@ export const parseDate = (dateString) => {
 export const getHeaders = (data) => {
   var headers = Object.keys(data[0]);
   headers = headers.filter((value) => {
-    if ( value === "Posted Date" || value === "id" ) {
+    if ( value === "Posted Date" || value === "id" || value === "Card No." ) {
       return false;
     }
     return true;
