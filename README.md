@@ -4,7 +4,7 @@ This is a development project and not intended for production use.
 
 Application designed to work with CapitalOne transaction dowloads in CSV file format.
 
-Imported data must be a .csv file with the following table headers:
+Imported data must be a .csv file with the following table headers (example data in project repo):
 - "Transaction Date"
 - "Posted Date"
 - "Category"
