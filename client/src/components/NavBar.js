@@ -81,7 +81,7 @@ const useStyles = makeStyles(theme => ({
 
 const getNavOptions = () => ({
   options: [
-  	{ text: "Home", icon: "large home icon"},
+  	{ text: "Home (Under Development)", icon: "large home icon"},
   	{ text: "View Transaction Data", icon: "large database icon"},
   	{ text: "Analysis", icon: "large table icon"},
   	{ text: "Import Transaction Data", icon: "large upload icon"},
