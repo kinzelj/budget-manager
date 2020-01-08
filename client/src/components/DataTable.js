@@ -80,7 +80,7 @@ export default class DataTable extends React.Component {
   handleCategoryChange = (event, index) => {
     this.props.categoryChange(event.target.value, event.target.id, index);
   }
-  
+
 
   getOptions = (header, checkHeader) => {
     const optionsJSX = header.options.map((option, index) => {
@@ -126,11 +126,11 @@ export default class DataTable extends React.Component {
   handleFilterChange = (event) => {
     const filterSelect = event.target.value;
     const filterClass = event.target.getAttributeNode('class');
-    this.setState({filterSelect: filterSelect, filterClass: filterClass}, () => {
+    this.setState({ filterSelect: filterSelect, filterClass: filterClass }, () => {
       this.props.filterChange(this.state.filterSelect, this.state.filterClass);
     })
   }
-  
+
   renderTableHeader = (headerData) => {
     const headersJSX = headerData.map((header) => {
 
@@ -161,25 +161,32 @@ export default class DataTable extends React.Component {
   }
 
   renderTableData = (headers, data) => {
-    const tableJSX = data.map((row, index) => {
-      const rowJSX = headers.map((header, i) => {
-        const cellKey = header.name + index;
+    console.log(headers, data);
+    let tableJSX = {};
+    if (headers[0] === '') {
+      tableJSX = <tr className='body-row' key='nulltable'>No Data Found. Please refresh table.</tr>;
+    }
+    else {
+      tableJSX = data.map((row, index) => {
+        const rowJSX = headers.map((header, i) => {
+          const cellKey = header.name + index;
 
-        //add theme style to value style object or set default style
-        var headerStyle = this.getStyles(header, 'body');
+          //add theme style to value style object or set default style
+          var headerStyle = this.getStyles(header, 'body');
 
-        var displayContents = this.getCellContents(row, header, index);
+          var displayContents = this.getCellContents(row, header, index);
 
 
-        return (
-          <td className='body-cell' key={cellKey} style={headerStyle}>
-            {displayContents}
-          </td>
-        )
-      })
-      const rowKey = "row" + index;
-      return (<tr className='body-row' key={rowKey}>{rowJSX}</tr>);
-    });
+          return (
+            <td className='body-cell' key={cellKey} style={headerStyle}>
+              {displayContents}
+            </td>
+          )
+        })
+        const rowKey = "row" + index;
+        return (<tr className='body-row' key={rowKey}>{rowJSX}</tr>);
+      });
+    }
     return tableJSX;
   }
 

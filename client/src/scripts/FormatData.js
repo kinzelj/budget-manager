@@ -76,57 +76,59 @@ export const parseDate = (dateString) => {
 }
 
 export const getHeaders = (data) => {
-  var headers = Object.keys(data[0]);
-  headers = headers.filter((value) => {
-    if ( value === "Posted Date" || value === "id" || value === "Card No." ) {
-      return false;
+  if (data[0]) {
+    var headers = Object.keys(data[0]);
+    headers = headers.filter((value) => {
+      if (value === "Posted Date" || value === "id" || value === "Card No.") {
+        return false;
+      }
+      return true;
+    });
+
+    var descriptionOptions = [];
+    for (const index in data) {
+      if (!(descriptionOptions.includes(data[index]['Description']))) {
+        descriptionOptions.push(data[index]['Description']);
+      }
     }
-    return true;
-  });
-  
-  var descriptionOptions = [];
-  for (const index in data) {
-    if (!(descriptionOptions.includes(data[index]['Description']))) {
-      descriptionOptions.push(data[index]['Description']);
-    }
+    const descriptionObjectArray = descriptionOptions.map((description) => {
+      return { id: description, value: description }
+    });
+
+
+    const headersObject = headers.map((value, index) => {
+      var returnObject = {
+        style: { width: 150, textAlign: 'left' },
+        key: value,
+        name: value,
+        numeric: false,
+        edit: false,
+        filter: false,
+      }
+      if (value === "Category") {
+        returnObject.className = 'category';
+        returnObject.theme = 'dropdown';
+        returnObject.edit = true;
+        returnObject.filter = true;
+        returnObject.options = [{ id: "All Categories", value: "All Categories" }, ...categoryOptions];
+      }
+      if (value === "Credit" || value === "Debit") {
+        returnObject.numeric = true;
+        returnObject.theme = 'currency';
+        returnObject.style.width = 75;
+      }
+      if (value === "Description") {
+        returnObject.className = 'description';
+        returnObject.style.width = 300;
+        returnObject.style.textAlign = 'left';
+        returnObject.filter = true;
+        returnObject.options = [{ id: "All Descriptions", value: "All Descriptions" }, ...descriptionObjectArray];
+      }
+      return returnObject;
+    })
+    return headersObject;
   }
-  const descriptionObjectArray = descriptionOptions.map((description) => {
-    return { id: description, value: description }
-  });
-  
-
-  const headersObject = headers.map((value, index) => {
-    var returnObject = {
-      style: { width: 150, textAlign: 'left' },
-      key: value,
-      name: value,
-      numeric: false,
-      edit: false,
-      filter: false,
-    }
-    if (value === "Category") {
-      returnObject.className = 'category';
-      returnObject.theme = 'dropdown';
-      returnObject.edit = true;
-      returnObject.filter = true;
-      returnObject.options = [{id: "All Categories", value: "All Categories"},...categoryOptions];
-    }
-    if (value === "Credit" || value === "Debit") {
-      returnObject.numeric = true;
-      returnObject.theme = 'currency';
-      returnObject.style.width = 75;
-    }
-    if (value === "Description") {
-      returnObject.className= 'description';
-      returnObject.style.width = 300;
-      returnObject.style.textAlign = 'left';
-      returnObject.filter = true;
-      returnObject.options = [{id: "All Descriptions", value: "All Descriptions"},...descriptionObjectArray];
-    }
-    return returnObject;
-  })
-  return headersObject;
-
+  else return [""];
 }
 
 
@@ -194,7 +196,7 @@ export const filterCategories = (data, filterValue) => {
   let filteredData = data;
   if (filterValue !== "All Categories") {
     filteredData = data.filter((entry) => {
-      return entry.Category === filterValue; 
+      return entry.Category === filterValue;
     })
   }
   return filteredData;
@@ -203,7 +205,7 @@ export const filterDescriptions = (data, filterValue) => {
   let filteredData = data;
   if (filterValue !== "All Descriptions") {
     filteredData = data.filter((entry) => {
-      return entry.Description === filterValue; 
+      return entry.Description === filterValue;
     })
   }
   return filteredData;
@@ -269,7 +271,7 @@ export const groupCategories = (data) => {
         graphValues[data[index]['Category']] = Number(data[index]['Debit']);
       }
       else if (Number(data[index]['Credit']) > 0) {
-        graphValues[data[index]['Category']] = Number(data[index]['Credit'])*-1;
+        graphValues[data[index]['Category']] = Number(data[index]['Credit']) * -1;
       }
     }
   }

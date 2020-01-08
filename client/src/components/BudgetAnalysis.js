@@ -18,7 +18,7 @@ const columnStyle = () => ({
 class BudgetAnalysis extends Component {
   constructor(props) {
     super(props);
-    this.tableStart = 30 //number of days to show as default table date range
+    this.tableStart = 60 //number of days to show as default table date range
     this.colStyle = columnStyle();
     this.sliderInit = [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()];
     this.formattedData = FormatData.formatData(this.props.data);
@@ -35,6 +35,7 @@ class BudgetAnalysis extends Component {
   }
 
   handleDateUpdate = (dateRange) => {
+    console.log(this.state.tableData);
     const newDate = [new Date(dateRange.value[0]), new Date(dateRange.value[1])];
     const newData = FormatData.setAnalysisData(this.formattedData, newDate);
     const newGraph = FormatData.groupCategories(newData);
@@ -43,7 +44,10 @@ class BudgetAnalysis extends Component {
       analysisData: newData,
       graphData: newGraph,
       tableData: newData,
-    }, () => { this.setState({ loading: false }) });
+    }, () => { 
+      console.log(this.state.tableData);
+      this.setState({ loading: false }) 
+    });
   }
 
   handleCategoryFilter = (filterCategory) => {
