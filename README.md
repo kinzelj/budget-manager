@@ -23,5 +23,5 @@ To deploy development environment, use the following terminal commands:
 7. `npm run dev`
 
 In project directory create .env file with the following environment variable updated with users mongoDB URI:
-- `MONGO_URI="user mongoDB URI"`
+- `MONGO_URI="<user mongoDB URI>"`
                                                       
