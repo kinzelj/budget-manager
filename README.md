@@ -1,6 +1,15 @@
 Web application to manage personal budget.
 
-This is a development project and not intended for production use. Currently only supports Capital One transaction import from CSV file with the following table headers:
+This is a development project and not intended for production use. 
+Application designed to work with CapitalOne transaction dowloads in CSV file format.
+
+Imported data must be a .csv file with the following table headers:
+- "Transaction Date"
+- "Posted Date"
+- "Category"
+- "Description"
+- "Credit"
+- "Debit" 
 
 To deploy development environment, use the following terminal commands:
 1. `git clone https://github.com/kinzelj/budget-manager.git`
