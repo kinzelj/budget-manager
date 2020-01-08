@@ -1,8 +1,8 @@
-Web application that simulates inventory management of Zoo database items.
+Web application to manage personal budget.
 
-To deploy development environment:
+This is a development project and not intended for production use. Currently only supports Capital One transaction import from CSV file with the following table headers:
 
-In command terminal:
+To deploy development environment, use the following terminal commands:
 1. `git clone https://github.com/kinzelj/budget-manager.git`
 2. `cd budget-manager/`
 3. `npm install`
