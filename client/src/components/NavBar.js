@@ -15,6 +15,7 @@ import ViewTransactions from './ViewTransactions';
 import FileUpload from './FileUpload';
 import BudgetAnalysis from './BudgetAnalysis';
 import Home from './Home';
+import Settings from './Settings';
 
 const drawerWidth = 275;
 
@@ -116,6 +117,8 @@ export default function MiniDrawer() {
         return(<BudgetAnalysis/>)
       case ('Import Transaction Data'): 
         return(<FileUpload handleRedirect={handleMenuClick}/>);
+      case ('Budget Input Settings'): 
+        return(<Settings/>);
       default:
         return(<Home/>);
     }
