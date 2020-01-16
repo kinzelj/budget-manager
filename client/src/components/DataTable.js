@@ -161,7 +161,6 @@ export default class DataTable extends React.Component {
   }
 
   renderTableData = (headers, data) => {
-    console.log(headers, data);
     let tableJSX = {};
     if (headers[0] === '') {
       tableJSX = <tr className='body-row' key='nulltable'>No data found. Please refresh table or import data.</tr>;
