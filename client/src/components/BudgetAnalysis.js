@@ -17,8 +17,8 @@ const columnStyle = () => ({
 
 class BudgetAnalysis extends Component {
   constructor(props) {
-    super(props);
-    this.tableStart = 30 //number of days to show as default table date range
+  super(props);
+    this.tableStart = 120 //number of days to show as default table date range
     this.colStyle = columnStyle();
     this.sliderInit = [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()];
     this.formattedData = FormatData.formatData(this.props.data);
