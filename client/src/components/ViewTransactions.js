@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import DataTable from './DataTable.js';
+import AddTransactionPopup from './AddTransactionPopup.js';
 import Slider from './Slider.js';
 import Button from '@material-ui/core/Button';
 import Loader from './Loader.js';
@@ -26,6 +27,7 @@ class ViewTransactions extends Component {
       updateCategoryRows: [],
       editCategories: false,
       refresh: false,
+      addTransactionPopup: false,
     }
   }
 
@@ -162,6 +164,19 @@ class ViewTransactions extends Component {
     }
 
   }
+  
+  handleAddTransaction = () => {
+    this.setState({
+      addTransactionPopup: true
+    })
+  }
+  
+  handleClosePopup = () => {
+    console.log('test');
+    this.setState({
+      addTransactionPopup: false 
+    })   
+  }
 
   render() {
     const {
@@ -170,7 +185,8 @@ class ViewTransactions extends Component {
       dateRange,
       loading,
       editCategories,
-      sliderInit
+      sliderInit,
+      addTransactionPopup
     } = this.state
     if (loading) {
       return (
@@ -183,6 +199,9 @@ class ViewTransactions extends Component {
           </div>
         </div>
       );
+    }
+    else if (addTransactionPopup) {
+      return (<AddTransactionPopup closePopup={this.handleClosePopup}/>);
     }
     else {
       return (
@@ -200,6 +219,9 @@ class ViewTransactions extends Component {
               Import New Data
             </Button>
             {this.getEditButton()}
+            <Button onClick={this.handleAddTransaction} variant="contained" color="secondary" style={{ marginTop: '10px', marginLeft: '20px' }}>
+             Add Transaction 
+            </Button>
           </div>
         </div>
       );
