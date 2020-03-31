@@ -91,6 +91,9 @@ export const getHeaders = (data) => {
         descriptionOptions.push(data[index]['Description']);
       }
     }
+
+    descriptionOptions.sort();
+
     const descriptionObjectArray = descriptionOptions.map((description) => {
       return { id: description, value: description }
     });

@@ -112,6 +112,8 @@ app.get('/get-settings', function (req, res) {
 //update budget settings in database
 app.post('/update-settings', async function (req, res) {
   const Settings = DB.model('budget-settings');
+  const userID = req.body.id;
+  console.log("User ID: ", userID);
 });
 
 app.get('/get-env', function (req, res) {

@@ -20,7 +20,8 @@ class ViewTransactions extends Component {
       importData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
       tableData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
       categoryData: [{ "Transaction Date": new Date(), "Posted Date": new Date() }],
-      sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()],
+      // sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()],
+      sliderInit: [new Date(new Date().getFullYear(), 0, 1), new Date()],
       sliderRange: [],
       tableHeaders: [],
       dateRange: [new Date(0), new Date()],
@@ -112,7 +113,6 @@ class ViewTransactions extends Component {
         break;
       }
       case ('description'): {
-        console.log(this.state);
         const filteredTable = FormatData.filterDescriptions(this.state.categoryData, filterCategory);
         this.setState({
           tableData: filteredTable,

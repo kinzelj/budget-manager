@@ -55,3 +55,13 @@ export const updateCategories = async (updateArray) => {
     const res = await axios(options);
     return res.data;
 }
+
+export const updateSettings = async (settings) => {
+    const options = {
+        method: 'POST',
+        url: '/update-settings',
+        data: settings 
+    }
+    const res = await axios(options);
+    return res.data;
+}
