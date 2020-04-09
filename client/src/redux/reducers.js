@@ -11,6 +11,18 @@ const dataReducer = function (state = {}, action) {
     }
 }
 
+const settingsReducer = function (state = {}, action) {
+    switch (action.type) {
+        case 'fetch-settings': {
+            return action.payload;
+        }
+        default: {
+            return state;
+        }
+    }
+}
+
 export default combineReducers({
-    data: dataReducer
+    data: dataReducer,
+    settings: settingsReducer
 })

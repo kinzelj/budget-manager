@@ -56,12 +56,25 @@ export const updateCategories = async (updateArray) => {
     return res.data;
 }
 
-export const updateSettings = async (settings) => {
+export const getSettings = async (user) => {
     const options = {
-        method: 'POST',
-        url: '/update-settings',
-        data: settings 
+        method: 'GET',
+        url: '/settings',
+        params: {user_id: user}
     }
     const res = await axios(options);
     return res.data;
+}
+
+export const updateSettings = async (settings) => {
+    const options = {
+        method: 'PUT',
+        url: '/settings',
+        data: settings 
+    }
+    const res = await axios(options);
+    if (res.data.nModified > 0){
+        return(1);
+    }
+    else {return(0)}
 }

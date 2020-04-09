@@ -51,10 +51,25 @@ Fade.propTypes = {
   onExited: PropTypes.func,
 };
 
-export default function AddTransactionPopup(props) {
+export default function Popup(props) {
   console.log(props);
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+  const [message, setMessage] = React.useState("");
+  const [buttonText, setButtonText] = React.useState("");
+
+  React.useEffect(() => {
+    switch(props.type){
+      case "settingsOk":
+        {
+          setMessage(props.message);
+          setButtonText("OK");
+          break;
+        }
+        default:
+          break;
+    }
+  }, [props])
 
   const handleClose = () => {
     setOpen(false);
@@ -82,8 +97,11 @@ export default function AddTransactionPopup(props) {
       >
         <Fade in={open}>
           <div className={classes.paper}>
+            <div>
+              <h3>{message}</h3>
+            </div>
             <Button onClick={handleSubmit} variant="contained" color="primary">
-    					Submit
+              {buttonText}
             </Button>
           </div>
         </Fade>

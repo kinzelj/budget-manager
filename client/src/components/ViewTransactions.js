@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import DataTable from './DataTable.js';
-import AddTransactionPopup from './AddTransactionPopup.js';
+import Popup from './Popup.js';
 import Slider from './Slider.js';
 import Button from '@material-ui/core/Button';
 import Loader from './Loader.js';
@@ -64,7 +64,7 @@ class ViewTransactions extends Component {
         tableData: tableData,
         dateRange: dateRange,
         sliderInit: [new Date((new Date()).getTime() - (86400000 * this.tableStart)), new Date()],
-      	tableHeaders: FormatData.getHeaders(tableData),
+        tableHeaders: FormatData.getHeaders(tableData),
         loading: false
       });
     }
@@ -101,14 +101,14 @@ class ViewTransactions extends Component {
 
   handleFilter = (filterCategory, filterClass) => {
     switch (filterClass.value) {
-      case ('category'):{
-    		const formattedData = FormatData.formatData(this.props.data);
-    		const tableData = FormatData.setTableData(formattedData, this.state.sliderRange)
+      case ('category'): {
+        const formattedData = FormatData.formatData(this.props.data);
+        const tableData = FormatData.setTableData(formattedData, this.state.sliderRange)
         const categoryData = FormatData.filterCategories(tableData, filterCategory);
         this.setState({
           tableData: categoryData,
           categoryData: categoryData,
-      		tableHeaders: FormatData.getHeaders(categoryData),
+          tableHeaders: FormatData.getHeaders(categoryData),
         });
         break;
       }
@@ -116,13 +116,13 @@ class ViewTransactions extends Component {
         const filteredTable = FormatData.filterDescriptions(this.state.categoryData, filterCategory);
         this.setState({
           tableData: filteredTable,
-        });     
+        });
         break;
       }
       default:
         return;
     }
-    
+
   }
 
   handleEditCategories = () => {
@@ -145,37 +145,37 @@ class ViewTransactions extends Component {
     })
   }
 
-  
+
 
   getEditButton = () => {
     if (this.state.editCategories) {
       return (
         <Button id='save-data-button' onClick={this.handleSaveCategories} variant="contained" color="primary" style={{ marginTop: '10px', marginLeft: '20px', backgroundColor: '#047700' }}>
           Save Data
-            </Button>
+        </Button>
       );
     }
     else {
       return (
         <Button id='edit-categories-button' onClick={this.handleEditCategories} variant="contained" color="primary" style={{ marginTop: '10px', marginLeft: '20px' }}>
           Edit Categories
-            </Button>
+        </Button>
       );
     }
 
   }
-  
+
   handleAddTransaction = () => {
     this.setState({
       addTransactionPopup: true
     })
   }
-  
+
   handleClosePopup = () => {
     console.log('test');
     this.setState({
-      addTransactionPopup: false 
-    })   
+      addTransactionPopup: false
+    })
   }
 
   render() {
@@ -201,13 +201,15 @@ class ViewTransactions extends Component {
       );
     }
     else if (addTransactionPopup) {
-      return (<AddTransactionPopup closePopup={this.handleClosePopup}/>);
+      return (<Popup closePopup={this.handleClosePopup} />);
     }
     else {
       return (
-        <div className="app" style={{ width: '90%', margin: 'auto' }}>
+        <div className="app" style={{ margin: 'auto' }}>
           <div className='table-slider' style={{ maxWidth: '930px' }}>
-            <Slider minWidth='683px' handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
+            <div style={{ marginLeft: '5px' }}>
+              <Slider minWidth='683px' handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Table"} sliderInit={sliderInit} />
+            </div>
             <DataTable
               filterChange={this.handleFilter}
               edit={editCategories}
@@ -220,7 +222,7 @@ class ViewTransactions extends Component {
             </Button>
             {this.getEditButton()}
             <Button onClick={this.handleAddTransaction} variant="contained" color="secondary" style={{ marginTop: '10px', marginLeft: '20px' }}>
-             Add Transaction 
+              Add Transaction
             </Button>
           </div>
         </div>

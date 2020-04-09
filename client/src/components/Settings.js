@@ -6,6 +6,11 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
+import Popup from './Popup.js';
+
+import * as ServerRoutes from '../routes/ServerRoutes.js';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchSettings } from '../redux/actions.js';
 
 const useStyles = makeStyles(theme => ({
   rootForm: {
@@ -50,40 +55,42 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function InputAdornments() {
+  const dispatch = useDispatch()
+  const settings = useSelector(state => state.settings);
+
   const classes = useStyles();
   const [values, setValues] = React.useState({
     //monthly income
-    income: 3734,
+    income: settings.income,
 
     //yearly expenses
-    vacation: 2000,
-    car_expenses: 200,
-    car_insurance: 1000,
-    home_insurance: 50,
-    property_taxes: 0,
-    gifts: 200,
-    donations: 2000,
-    other_yearly: 500,
+    vacation: settings.vacation,
+    car_expenses: settings.car_expenses,
+    car_insurance: settings.car_insurance,
+    home_insurance: settings.home_insurance,
+    property_taxes: settings.property_taxes,
+    gifts: settings.gifts,
+    donations: settings.donations,
+    other_yearly: settings.other_yearly,
 
     //savings
-    savings: 17,
+    savings: settings.savings,
 
     //monthly % of budget, must sum to 100%
-    housing: 30,
-    utilities: 3,
-    phone: 2,
-    internet: 1.5,
-    tv: 2,
-    groceries: 7,
-    gas: 6,
-    dining: 10,
-    merchandise: 5,
-    entertainment: 3.5,
-    transportation: 5,
-    personal: 1,
-    subscriptions: 2,
-    other_monthly: 5,
-
+    housing: settings.housing,
+    utilities: settings.utilities,
+    phone: settings.phone,
+    internet: settings.internet,
+    tv: settings.tv,
+    groceries: settings.groceries,
+    gas: settings.gas,
+    dining: settings.dining,
+    merchandise: settings.merchandise,
+    entertainment: settings.entertainment,
+    transportation: settings.transportation,
+    personal: settings.personal,
+    subscriptions: settings.subscriptions,
+    other_monthly: settings.other_monthly,
   });
 
   //
@@ -112,6 +119,10 @@ export default function InputAdornments() {
     setAvailIncome(calcAvailIncome(values), [])
   }, [values])
 
+
+  const [showPopup, setShowPopup] = React.useState(false);
+  const [popupMessage, setPopupMessage] = React.useState("Error: No settings changed or updated.");
+
   const handleChange = (prop, value) => {
     setValues({ ...values, [prop]: Number(Number(value).toFixed(2)) });
   };
@@ -123,318 +134,331 @@ export default function InputAdornments() {
     }
   }
 
-  const handleSubmit = prop => event => {
-    console.log(values);
+  const handleSubmit = prop => async (event) => {
+    const res = await ServerRoutes.updateSettings({ ...values, user_id: "kinzelj" })
+    if (res > 0) {setPopupMessage("User settings updated.")}
+    else {setPopupMessage("Error: No settings changed or updated.")}
+    dispatch(fetchSettings('kinzelj'));
+    setShowPopup(true);
   }
 
-  return (
-    <form className={classes.rootForm} noValidate autoComplete="off">
-      <div className={classes.rootDiv}>
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  }
 
-        <div className={classes.container}>
-          {/******************************* Monthly Income ******************************************/}
-          <div className={classes.div}>
-            <h4 className={classes.h4}>Income</h4>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Monthly Net Income</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.income}
-                onKeyDown={handleKeyDown('income')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={130}
-                required
-              />
-            </FormControl>
-          </div>
-        </div>
+  if (showPopup) {
+    return (<Popup closePopup={handleClosePopup} type={"settingsOk"} message={popupMessage}/>);
+  }
+  else {
+    return (
+      <form className={classes.rootForm} noValidate autoComplete="off">
+        <div className={classes.rootDiv}>
 
-        <div className={classes.container}>
-          {/******************************* Monthly Budget ******************************************/}
-          <div className={classes.div}>
-            <h4 className={classes.h4}>Monthly Budget (% of budget)</h4>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Savings</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.savings}
-                onKeyDown={handleKeyDown('savings')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={55}
-              />
-              <p>{"$" + (availableIncome * (values.savings / 100)).toFixed(2)}</p>
-            </FormControl>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Morgage/Rent</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.housing}
-                onKeyDown={handleKeyDown('housing')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.housing / 100)).toFixed(2)}</p>
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Utilities</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.utilities}
-                onKeyDown={handleKeyDown('utilities')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.utilities / 100)).toFixed(2)}</p>
-            </FormControl>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Phone</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.phone}
-                onKeyDown={handleKeyDown('phone')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.phone / 100)).toFixed(2)}</p>
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Internet</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.internet}
-                onKeyDown={handleKeyDown('internet')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.internet / 100)).toFixed(2)}</p>
-            </FormControl>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">TV</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.tv}
-                onKeyDown={handleKeyDown('tv')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.tv / 100)).toFixed(2)}</p>
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Groceries</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.groceries}
-                onKeyDown={handleKeyDown('groceries')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.groceries / 100)).toFixed(2)}</p>
-            </FormControl>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Gasoline</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.gas}
-                onKeyDown={handleKeyDown('gas')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.gas / 100)).toFixed(2)}</p>
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Dining</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.dining}
-                onKeyDown={handleKeyDown('dining')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.dining / 100)).toFixed(2)}</p>
-            </FormControl>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Merchandise</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.merchandise}
-                onKeyDown={handleKeyDown('merchandise')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.merchandise / 100)).toFixed(2)}</p>
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Entertainment</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.entertainment}
-                onKeyDown={handleKeyDown('entertainment')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.entertainment / 100)).toFixed(2)}</p>
-            </FormControl>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Transportation</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.transportation}
-                onKeyDown={handleKeyDown('transportation')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.transportation / 100)).toFixed(2)}</p>
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Personal</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.personal}
-                onKeyDown={handleKeyDown('personal')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.personal / 100)).toFixed(2)}</p>
-            </FormControl>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Subscriptions</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.subscriptions}
-                onKeyDown={handleKeyDown('subscriptions')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.subscriptions / 100)).toFixed(2)}</p>
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Other</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.other_monthly}
-                onKeyDown={handleKeyDown('other_monthly')}
-                startAdornment={<InputAdornment position="start">%</InputAdornment>}
-                labelWidth={105}
-              />
-              <p>{"$" + (availableIncome * (values.other_monthly / 100)).toFixed(2)}</p>
-            </FormControl>
-
-          <h5 style={{marginTop: '5px'}}>Sum of Percentages (Must Equal 100%): %{budget_percent_sum}</h5>
+          <div className={classes.container}>
+            {/******************************* Monthly Income ******************************************/}
+            <div className={classes.div}>
+              <h4 className={classes.h4}>Income</h4>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Monthly Net Income</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.income}
+                  onKeyDown={handleKeyDown('income')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={130}
+                  required
+                />
+              </FormControl>
+            </div>
           </div>
 
-          {/******************************* Yearly Expenses ******************************************/}
-          <div className={classes.div}>
-            <h4 className={classes.h4}>Yearly Expenses ($/year)</h4>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Home Insurance</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.home_insurance}
-                onKeyDown={handleKeyDown('home_insurance')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={110}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Property Taxes</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.property_taxes}
-                onKeyDown={handleKeyDown('property_taxes')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={110}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Car Insurance</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.car_insurance}
-                onKeyDown={handleKeyDown('car_insurance')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={95}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Car Expenses</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.car_expenses}
-                onKeyDown={handleKeyDown('car_expenses')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={95}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Vacation</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.vacation}
-                onKeyDown={handleKeyDown('vacation')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={105}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Gifts</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.gifts}
-                onKeyDown={handleKeyDown('gifts')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={105}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Donations</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.donations}
-                onKeyDown={handleKeyDown('donations')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={105}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl className={classes.margin} variant="outlined">
-              <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Other Yearly Expenses</InputLabel>
-              <OutlinedInput
-                className={classes.box}
-                defaultValue={values.other_yearly}
-                onKeyDown={handleKeyDown('other_yearly')}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                labelWidth={105}
-              />
-            </FormControl>
+          <div className={classes.container}>
+            {/******************************* Monthly Budget ******************************************/}
+            <div className={classes.div}>
+              <h4 className={classes.h4}>Monthly Budget (% of budget)</h4>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Savings</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.savings}
+                  onKeyDown={handleKeyDown('savings')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={55}
+                />
+                <p>{"$" + (availableIncome * (values.savings / 100)).toFixed(2)}</p>
+              </FormControl>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Morgage/Rent</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.housing}
+                  onKeyDown={handleKeyDown('housing')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.housing / 100)).toFixed(2)}</p>
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Utilities</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.utilities}
+                  onKeyDown={handleKeyDown('utilities')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.utilities / 100)).toFixed(2)}</p>
+              </FormControl>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Phone</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.phone}
+                  onKeyDown={handleKeyDown('phone')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.phone / 100)).toFixed(2)}</p>
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Internet</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.internet}
+                  onKeyDown={handleKeyDown('internet')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.internet / 100)).toFixed(2)}</p>
+              </FormControl>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">TV</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.tv}
+                  onKeyDown={handleKeyDown('tv')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.tv / 100)).toFixed(2)}</p>
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Groceries</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.groceries}
+                  onKeyDown={handleKeyDown('groceries')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.groceries / 100)).toFixed(2)}</p>
+              </FormControl>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Gasoline</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.gas}
+                  onKeyDown={handleKeyDown('gas')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.gas / 100)).toFixed(2)}</p>
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Dining</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.dining}
+                  onKeyDown={handleKeyDown('dining')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.dining / 100)).toFixed(2)}</p>
+              </FormControl>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Merchandise</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.merchandise}
+                  onKeyDown={handleKeyDown('merchandise')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.merchandise / 100)).toFixed(2)}</p>
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Entertainment</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.entertainment}
+                  onKeyDown={handleKeyDown('entertainment')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.entertainment / 100)).toFixed(2)}</p>
+              </FormControl>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Transportation</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.transportation}
+                  onKeyDown={handleKeyDown('transportation')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.transportation / 100)).toFixed(2)}</p>
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Personal</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.personal}
+                  onKeyDown={handleKeyDown('personal')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.personal / 100)).toFixed(2)}</p>
+              </FormControl>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Subscriptions</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.subscriptions}
+                  onKeyDown={handleKeyDown('subscriptions')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.subscriptions / 100)).toFixed(2)}</p>
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Other</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.other_monthly}
+                  onKeyDown={handleKeyDown('other_monthly')}
+                  startAdornment={<InputAdornment position="start">%</InputAdornment>}
+                  labelWidth={105}
+                />
+                <p>{"$" + (availableIncome * (values.other_monthly / 100)).toFixed(2)}</p>
+              </FormControl>
+
+              <h5 style={{ marginTop: '5px' }}>Sum of Percentages (Must Equal 100%): %{budget_percent_sum}</h5>
+            </div>
+
+            {/******************************* Yearly Expenses ******************************************/}
+            <div className={classes.div}>
+              <h4 className={classes.h4}>Yearly Expenses ($/year)</h4>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Home Insurance</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.home_insurance}
+                  onKeyDown={handleKeyDown('home_insurance')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={110}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Property Taxes</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.property_taxes}
+                  onKeyDown={handleKeyDown('property_taxes')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={110}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Car Insurance</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.car_insurance}
+                  onKeyDown={handleKeyDown('car_insurance')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={95}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Car Expenses</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.car_expenses}
+                  onKeyDown={handleKeyDown('car_expenses')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={95}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Vacation</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.vacation}
+                  onKeyDown={handleKeyDown('vacation')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={105}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Gifts</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.gifts}
+                  onKeyDown={handleKeyDown('gifts')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={105}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Donations</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.donations}
+                  onKeyDown={handleKeyDown('donations')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={105}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Other Yearly Expenses</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.other_yearly}
+                  onKeyDown={handleKeyDown('other_yearly')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={105}
+                />
+              </FormControl>
+            </div>
+          </div>
+
+          <p>**Important** You must hit Tab or Enter after each modification for the change to take effect before you click UPDATE.</p>
+          <div className={classes.button}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              className={classes.button}
+              startIcon={<SaveIcon />}
+              onClick={handleSubmit()}
+            >Update</Button>
           </div>
         </div>
-
-        <p>**Important** You must hit Tab or Enter after each modification for the change to take effect when you click UPDATE.</p>
-        <div className={classes.button}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            className={classes.button}
-            startIcon={<SaveIcon />}
-            onClick={handleSubmit()}
-          >Update</Button>
-        </div>
-      </div>
-    </form>
-  );
+      </form>
+    );
+  }
 }
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchData } from '../redux/actions.js';
+import { fetchData, fetchSettings } from '../redux/actions.js';
 
 import NavBar from './NavBar';
 
@@ -11,7 +11,8 @@ class App extends Component {
   getData = async () => {
     try {
       //call redux fetchData action creator
-      await this.props.fetchData()
+      await this.props.fetchData();
+      await this.props.fetchSettings("kinzelj");
     }
     catch (err) { console.log("Unable to retrieve data -->" + err) };
   }
@@ -24,4 +25,4 @@ class App extends Component {
   }
 }
 
-export default connect(null, { fetchData })(App);
+export default connect(null, { fetchData, fetchSettings })(App);

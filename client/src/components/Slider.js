@@ -20,7 +20,6 @@ const useStyles = makeStyles(theme => ({
 export default function RangeSlider(props) {
   const classes = useStyles();
   const [value, setValue] = React.useState([props.sliderInit[0].getTime(),props.sliderInit[1].getTime()]);
-  
 
   const handleUpdate = (event) => {
    props.handleUpdate({value}); 

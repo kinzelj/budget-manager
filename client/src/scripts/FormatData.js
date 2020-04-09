@@ -26,6 +26,27 @@ const categoryOptions = [
   { id: "Work Expense", value: "Work Expense" },
 ];
 
+export const months = [
+  {monthNum: 0, monthString: "Full Year"},
+  {monthNum: 1, monthString: "January"},
+  {monthNum: 2, monthString: "February"},
+  {monthNum: 3, monthString: "March"},
+  {monthNum: 4, monthString: "April"},
+  {monthNum: 5, monthString: "May"},
+  {monthNum: 6, monthString: "June"},
+  {monthNum: 7, monthString: "July"},
+  {monthNum: 8, monthString: "August"},
+  {monthNum: 9, monthString: "September"},
+  {monthNum: 10, monthString: "October"},
+  {monthNum: 11, monthString: "November"},
+  {monthNum: 12, monthString: "December"},
+];
+
+export const years = [
+  {yearNum: 2019, yearString: "2019"},
+  {yearNum: 2020, yearString: "2020"},
+]
+
 
 export const parseDate = (dateString) => {
   var year = '';
