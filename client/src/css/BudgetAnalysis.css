@@ -1,14 +1,6 @@
-:root {
-  --max-table-height: 520px;  
-}
-
-
-@media only screen and (max-width: 1825px) {
+@media only screen and (max-width: 1768px) {
     .column-table{
         min-width: var(--min-table-width);
-    }
-    .column-graph {
-        max-width: 650px;
     }
     .ui.stackable.grid>.wide.column {
         width: 100%!important;
@@ -21,6 +13,5 @@
 
 .table-body-div {
   overflow-y: scroll;
-  max-height: var(--max-table-height);
 }
 

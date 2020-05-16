@@ -11,3 +11,4 @@ const tSchema = new Schema({
 });
 
 mongoose.model('tactions', tSchema);
+mongoose.model('demo-tactions', tSchema);

@@ -1,0 +1,21 @@
+@media only screen and (max-width: 1570px){
+    .ui.stackable.grid>.column.row>.column, .ui.stackable.grid>.row>.column {
+        width: 100%!important;
+        margin: 0 0!important;
+        -webkit-box-shadow: none!important;
+        box-shadow: none!important;
+        padding: 1rem 0 !important;
+    }
+
+    .ui.segment.makeStyles-lineGraphStyle-134 {
+        margin-top: 0 !important;
+    }
+}
+
+@media only screen and (max-width: 767px){
+    .ui.stackable.grid, .ui.grid>.row {
+        padding-bottom: 1rem!important;
+    }
+}
+
+

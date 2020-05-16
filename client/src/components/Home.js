@@ -3,24 +3,54 @@ import { useSelector } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import * as FormatData from '../scripts/FormatData.js';
 
+import '../css/Home.css'
 import DataTable from './DataTable.js';
 import Loader from './Loader.js';
+import BarChart from './BarChart.js';
+import LineGraph from './LineGraph.js';
 
+
+const maxTableHeight = 425;
 const useStyles = makeStyles(theme => ({
   cellSelect: {
     width: '100px',
-    marginLeft: '5px',
   },
-  dataTable: {
-    maxWidth: '730px',
+  contentDiv: {
+    width: '100%',
+    marginTop: '-10px',
   },
-  budgetDiv: {
-    margin: 'auto'
+  timeFrame: {
+    maxWidth: '200px',
+    marginBottom: '28px !important',
+    marginLeft: '-14px !important',
   },
+  tableStyle: {
+    minWidth: '730px',
+    minHeight: '500px'
+  },
+  graphStyle: {
+    width: '100%',
+    minWidth: '730px',
+  },
+  lineGraphStyle: {
+    minHeight: '500px'
+  },
+  columnTable: {
+    padding: '0 !important',
+    paddingBottom: '0 !important'
+
+  },
+  columnLineGraph: {
+    paddingRight: '0 !important'
+  }
 }));
+
 export default function Home() {
   const classes = useStyles();
   const state = useSelector(state => state);
+  const data = state.data;
+  const user_settings = state.settings;
+
 
   const getDateRange = (year, month) => {
     let date = [];
@@ -45,17 +75,26 @@ export default function Home() {
 
   //set analysis data
   const [formattedData, setFormattedData] = React.useState([""]);
+  const [settings, setSettings] = React.useState({});
   const [tableData, setTableData] = React.useState([""]);
-  const [tableHeaders, setTableHeaders] = React.useState([]);
+  const [tableHeaders, setTableHeaders] = React.useState([""]);
+  const [barChartData, setBudgetBarChartData] = React.useState([""])
+  const [lineGraphData, setLineGraphData] = React.useState({ data: [""], sources: [""] })
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if (state.data[0]) {
-      setFormattedData(FormatData.formatData(state.data));
+    setLoading(true);
+    if (data[0]) {
+      setFormattedData(FormatData.formatData(data));
     }
-  }, [state]);
+    if (user_settings.user_id) {
+      setSettings(user_settings.settings);
+    }
+  }, [data, user_settings]);
 
   React.useEffect(() => {
+    setLoading(true);
+    setLineGraphData(null);
     setDateRange(getDateRange(year, month));
   }, [year, month]);
 
@@ -67,25 +106,30 @@ export default function Home() {
 
   React.useEffect(() => {
     setTableHeaders(FormatData.getHeaders(tableData));
-  }, [tableData]);
+    setBudgetBarChartData(FormatData.getBudgetBarData(tableData, settings, month));
+    setLineGraphData(FormatData.getLineGraphData(tableData, settings, dateRange));
+  }, [tableData, settings, month, dateRange]);
 
   React.useEffect(() => {
-    // console.log(tableHeaders);
-    // if (tableHeaders[0]) {
-    setLoading(false);
-    // }
-  }, [tableHeaders]);
-
-
+    if (lineGraphData) {
+      setLoading(false);
+    }
+  }, [lineGraphData]);
 
   const dateDropdown = (type) => {
     //set default dropdown value
     let value = "";
+    let label = "";
+    let labelStyle = {};
     if (type === "year") {
       value = year;
+      label = "Year: ";
+      labelStyle = { marginRight: '11px' };
     }
     if (type === "month") {
       value = month;
+      label = "Month: ";
+      labelStyle = { marginRight: '0px' };
     }
 
     //get dropdown options
@@ -111,16 +155,20 @@ export default function Home() {
 
     //return select dropdown
     return (
-      <select
-        className={classes.cellSelect}
-        key={`select-${type}`}
-        value={value}
-        onChange={(e) => { handleSelectChange(e, type) }}
-      >{getOptions(type)}</select>
+      <div>
+        <label style={labelStyle}>{label}</label>
+        <select
+          className={classes.cellSelect}
+          key={`select-${type}`}
+          value={value}
+          onChange={(e) => { handleSelectChange(e, type) }}
+        >{getOptions(type)}</select>
+      </div>
     )
   }
 
   const handleSelectChange = (event, type) => {
+    setLoading(true);
     if (type === "year") {
       setYear(event.target.value);
     }
@@ -131,11 +179,14 @@ export default function Home() {
 
   if (loading) {
     return (<div>
-      <div>
-        {dateDropdown("year")}
-      </div>
-      <div>
-        {dateDropdown("month")}
+      <div className={'ui segment ' + classes.timeFrame}>
+        <h4>Budget Time Frame</h4>
+        <div>
+          {dateDropdown("year")}
+        </div>
+        <div>
+          {dateDropdown("month")}
+        </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
         <Loader />
@@ -144,17 +195,39 @@ export default function Home() {
   }
   else {
     return (
-      <div className={classes.budgetDiv}>
-        <div>
-          {dateDropdown("year")}
+      <div className={classes.contentDiv}>
+        <div className={'ui segment ' + classes.timeFrame}>
+          <h4>Budget Time Frame</h4>
+          <div>
+            {dateDropdown("year")}
+          </div>
+          <div>
+            {dateDropdown("month")}
+          </div>
         </div>
-        <div>
-          {dateDropdown("month")}
+        <div className='ui stackable two column grid'>
+          <div className="two column row" style={{ paddingTop: '0' }}>
+            <div className={'column ' + classes.columnTable}>
+              <div className={'ui segment ' + classes.tableStyle}>
+                <DataTable
+                  data={tableData}
+                  headers={tableHeaders}
+                  maxHeight={maxTableHeight} />
+              </div>
+            </div>
+            <div className={'column ' + classes.columnLineGraph}>
+              <div className={'ui segment ' + classes.lineGraphStyle}>
+                <LineGraph dataSource={lineGraphData} />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className={classes.dataTable}>
-          <DataTable
-            data={tableData}
-            headers={tableHeaders} />
+        <div className="ui grid">
+          <div className={'ui segment ' + classes.graphStyle}>
+            <div className="column bar-graph">
+              <BarChart data={barChartData} />
+            </div>
+          </div>
         </div>
       </div>
     );

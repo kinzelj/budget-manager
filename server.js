@@ -38,7 +38,13 @@ app.post('/show-data', function (req, res) {
 });
 
 app.post('/import', async function (req, res) {
-  const Tactions = DB.model('tactions');
+  let Tactions;
+  if (process.env.DEMO === '1') {
+    Tactions = DB.model('demo-tactions');
+  }
+  else {
+    Tactions = DB.model('tactions');
+  }
   var returnContext = { env: process.env.ENVIRONMENT };
   for (const entry of req.body) {
     try {
@@ -69,33 +75,26 @@ app.post('/import', async function (req, res) {
   res.send(returnContext);
 });
 
-// app.post('/update-remote', async function (req, res) {
-//   try {
-//     //get data from local database
-//     const dbTactions = DB.model('tactions');
-//     const data = await dbTactions.find({});
-
-//     // remove documents from remote collection and insert data from local database
-//     const remoteTactions = remoteDB.model('tactions');
-//     await remoteTactions.deleteMany({}, async () => {
-//       await remoteTactions.collection.insertMany(data, function (err) {
-//         res.send("Local and remote databases updated");
-//       });
-//     });
-//   }
-//   catch (error) { console.log(error); }
-// });
-
-
-
 app.get('/data', async function (req, res) {
-  const Tactions = DB.model('tactions');
+  let Tactions;
+  if (process.env.DEMO === '1') {
+    Tactions = DB.model('demo-tactions');
+  }
+  else {
+    Tactions = DB.model('tactions');
+  }
   const data = await Tactions.find().sort({ "Transaction Date": -1 });
   res.send(data);
 });
 
 app.post('/update-categories', async function (req, res) {
-  const Tactions = DB.model('tactions');
+  let Tactions;
+  if (process.env.DEMO === '1') {
+    Tactions = DB.model('demo-tactions');
+  }
+  else {
+    Tactions = DB.model('tactions');
+  }
   for (const entry of req.body) {
     await Tactions.updateOne({ _id: entry.id }, {
       $set: { Category: entry.newCategory }
@@ -104,48 +103,87 @@ app.post('/update-categories', async function (req, res) {
   res.send(req.body);
 });
 
-//get budget settings from database
-app.get('/get-settings', function (req, res) {
-  const Settings = DB.model('budget-settings');
+app.get('/settings/:user_id/budget/:budget_id', async function (req, res) {
+  let Settings;
+  let filter;
+  if (process.env.DEMO === '1') {
+    Settings = DB.model('demo-budget-settings');
+    filter = { 'user_id': 'demo', 'budget_id': 'demo' }
+  }
+  else {
+    Settings = DB.model('budget-settings');
+    filter = { 'user_id': req.params.user_id, 'budget_id': req.params.budget_id }
+  }
+  const data = await Settings.findOne(filter);
+  res.send(data);
 });
 
-app.get('/settings', async function (req, res) {
-  const Settings = DB.model('budget-settings');
-  const data = await Settings.findOne({user_id: req.query.user_id});
+app.get('/settings/:user_id', async function (req, res) {
+  let Settings;
+  if (process.env.DEMO === '1') {
+    Settings = DB.model('demo-budget-settings');
+  }
+  else {
+    Settings = DB.model('budget-settings');
+  }
+  const filter = { 'user_id': req.params.user_id }
+  const data = await Settings.find(filter,{budget_id: 1});
   res.send(data);
 });
 
 //update budget settings in database
 app.put('/settings', async function (req, res) {
-  const Settings = DB.model('budget-settings');
-  const query = await Settings.updateOne({ user_id: req.body.user_id },
+  let Settings;
+  let user_id;
+  let budget_id;
+  if (process.env.DEMO === '1') {
+    Settings = DB.model('demo-budget-settings');
+    user_id = 'demo';
+    budget_id = 'demo';
+  }
+  else {
+    Settings = DB.model('budget-settings');
+    user_id = req.body.user_id;
+    budget_id = req.body.budget_id;
+  }
+
+  const query = await Settings.updateOne(
+    {
+      user_id: user_id,
+      budget_id: budget_id,
+    },
     {
       $set: {
-        income: req.body.income,
-        vacation: req.body.vacation,
-        car_expenses: req.body.car_expenses,
-        car_insurance: req.body.car_insurance,
-        home_insurance: req.body.home_insurance,
-        property_taxes: req.body.property_taxes,
-        gifts: req.body.gifts,
-        donations: req.body.donations,
-        other_yearly: req.body.other_yearly,
-        savings: req.body.savings,
-        housing: req.body.housing,
-        utilities: req.body.utilities,
-        phone: req.body.phone,
-        internet: req.body.internet,
-        tv: req.body.tv,
-        groceries: req.body.groceries,
-        gas: req.body.gas,
-        dining: req.body.dining,
-        merchandise: req.body.merchandise,
-        entertainment: req.body.entertainment,
-        transportation: req.body.transportation,
-        personal: req.body.personal,
-        subscriptions: req.body.subscriptions,
-        other_monthly: req.body.other_monthly 
+        settings: {
+          income: req.body.income,
+          vacation: req.body.vacation,
+          car_expenses: req.body.car_expenses,
+          car_insurance: req.body.car_insurance,
+          home_insurance: req.body.home_insurance,
+          property_taxes: req.body.property_taxes,
+          gifts: req.body.gifts,
+          donations: req.body.donations,
+          health: req.body.health,
+          other: req.body.other,
+          savings: req.body.savings,
+          housing: req.body.housing,
+          utilities: req.body.utilities,
+          phone: req.body.phone,
+          internet: req.body.internet,
+          tv: req.body.tv,
+          groceries: req.body.groceries,
+          gas: req.body.gas,
+          dining: req.body.dining,
+          merchandise: req.body.merchandise,
+          entertainment: req.body.entertainment,
+          transportation: req.body.transportation,
+          personal: req.body.personal,
+          subscriptions: req.body.subscriptions,
+        }
       }
+    },
+    {
+      upsert: true
     }
   )
   res.send(query);

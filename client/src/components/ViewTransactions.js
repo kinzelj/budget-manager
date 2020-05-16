@@ -32,6 +32,7 @@ class ViewTransactions extends Component {
     }
   }
 
+
   componentDidMount() {
     //format data and set component state
     const formattedData = FormatData.formatData(this.props.data);
@@ -216,6 +217,7 @@ class ViewTransactions extends Component {
               filter={this.filterCategories}
               categoryChange={this.updateCategory}
               data={tableData}
+              maxHeight={700}
               headers={tableHeaders} />
             <Button onClick={this.handleRedirectImport} variant="contained" color="primary" style={{ marginTop: '10px' }}>
               Import New Data

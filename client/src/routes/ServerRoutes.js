@@ -5,8 +5,8 @@ import axios from 'axios';
 **********************************************************************/
 
 export const convertData = async (dataFileToSend) => {
-  const res = await axios.post("/show-data", dataFileToSend, {});
-  return res.data.data;
+    const res = await axios.post("/show-data", dataFileToSend, {});
+    return res.data.data;
 }
 
 export const importData = async (data) => {
@@ -56,13 +56,19 @@ export const updateCategories = async (updateArray) => {
     return res.data;
 }
 
-export const getSettings = async (user) => {
-    const options = {
+export const getSettings = async (input) => {
+    const res = await axios({
         method: 'GET',
-        url: '/settings',
-        params: {user_id: user}
-    }
-    const res = await axios(options);
+        url: `/settings/${input.user_id}/budget/${input.budget_id}`,
+    });
+    return res.data;
+}
+
+export const getBudgets = async (id) => {
+    const res = await axios({
+        method: 'GET',
+        url: `/settings/${id}`,
+    });
     return res.data;
 }
 
@@ -70,11 +76,11 @@ export const updateSettings = async (settings) => {
     const options = {
         method: 'PUT',
         url: '/settings',
-        data: settings 
+        data: settings
     }
     const res = await axios(options);
-    if (res.data.nModified > 0){
-        return(1);
+    if (res.data.nModified > 0) {
+        return (1);
     }
-    else {return(0)}
+    else { return (0) }
 }

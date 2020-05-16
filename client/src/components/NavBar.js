@@ -75,6 +75,8 @@ const useStyles = makeStyles(theme => ({
     ...theme.mixins.toolbar,
   },
   content: {
+    width: '100%',
+    marginRight: '18px',
     flexGrow: 1,
     padding: theme.spacing(3),
   },

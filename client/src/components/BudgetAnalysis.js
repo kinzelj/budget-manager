@@ -11,7 +11,6 @@ const columnStyle = () => ({
     height: 600,
   },
   tableStyle: {
-    height: 600,
   }
 })
 
@@ -66,19 +65,20 @@ class BudgetAnalysis extends Component {
     const graphStyle = this.colStyle.graphStyle;
     const tableStyle = this.colStyle.tableStyle;
     return (
-      <div className='ui stackable two column grid first-row'>
-        <div className="six wide column column-graph">
+      <div className='ui stackable two column grid'>
+        <div className="six wide column column-graph" style={{minWidth:'622px', maxWidth:'622px'}}>
           <div className="ui segment" style={graphStyle}>
             <Slider handleUpdate={this.handleDateUpdate} dateRange={dateRange} buttonText={"Update Analysis"} sliderInit={sliderInit} />
             <h2 style={{ color: '#3f51b5', position: 'absolute', width: 600, textAlign: 'center', paddingTop: '20px' }}>Expenses by Category</h2>
             <PieChart handleClick={this.handleCategoryFilter} minWidth={650} data={graphData} />
           </div>
         </div>
-        <div className="nine wide column column-table" >
+        <div className="ten wide column column-table" >
           <div className="ui segment" style={tableStyle}>
             <DataTable
               className='analysis-table'
               data={tableData}
+              maxHeight={525}
               headers={tableHeaders} />
           </div>
         </div>

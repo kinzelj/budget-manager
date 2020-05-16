@@ -11,8 +11,9 @@ class App extends Component {
   getData = async () => {
     try {
       //call redux fetchData action creator
+      const settingsInit = {user_id: "kinzelj", budget_id: "2020 Budget"}
       await this.props.fetchData();
-      await this.props.fetchSettings("kinzelj");
+      await this.props.fetchSettings(settingsInit);
     }
     catch (err) { console.log("Unable to retrieve data -->" + err) };
   }

@@ -19,13 +19,33 @@ const useStyles = makeStyles(theme => ({
       width: '25ch',
     },
   },
+  rootDiv: {
+    maxWidth: '740px',
+    minWidth: '490px'
+  },
   div: {
     border: "solid #9e9e9e 1px",
     borderRadius: "4px",
     marginRight: "15px",
     minWidth: "237px"
   },
+  income: {
+    border: "solid #9e9e9e 1px",
+    borderRadius: "4px",
+    marginRight: "15px",
+    minWidth: "145px",
+    width: '32.5%',
+    position: 'absolute',
+    right: '0px'
+  },
+  budget_id: {
+    width: '100%',
+    height: '93.625px',
+    marginRight: "270px !important",
+    // paddingRight: '200px !important'
+  },
   container: {
+    position: 'relative',
     display: "flex",
     flexWrap: "wrap",
     marginBottom: "15px"
@@ -56,10 +76,14 @@ const useStyles = makeStyles(theme => ({
 
 export default function InputAdornments() {
   const dispatch = useDispatch()
-  const settings = useSelector(state => state.settings);
+  const user_settings = useSelector(state => state.settings);
+  const settings = user_settings.settings;
 
   const classes = useStyles();
   const [values, setValues] = React.useState({
+    user_id: user_settings.user_id,
+    budget_id: user_settings.budget_id,
+
     //monthly income
     income: settings.income,
 
@@ -71,7 +95,8 @@ export default function InputAdornments() {
     property_taxes: settings.property_taxes,
     gifts: settings.gifts,
     donations: settings.donations,
-    other_yearly: settings.other_yearly,
+    health: settings.health,
+    other: settings.other,
 
     //savings
     savings: settings.savings,
@@ -90,8 +115,93 @@ export default function InputAdornments() {
     transportation: settings.transportation,
     personal: settings.personal,
     subscriptions: settings.subscriptions,
-    other_monthly: settings.other_monthly,
+
+
+    // user_id: 'kinzelj',
+    // budget_year: 2020,
+
+    // //monthly income
+    // income: 0,
+
+    // //yearly expenses
+    // vacation: 0,
+    // car_expenses: 0,
+    // car_insurance: 0,
+    // home_insurance: 0,
+    // property_taxes: 0,
+    // gifts: 0,
+    // donations: 0,
+    // health: 0,
+    // other: 0,
+
+    // //savings
+    // savings: 0,
+
+    // //monthly % of budget, must sum to 100%
+    // housing: 0,
+    // utilities: 0,
+    // phone: 0,
+    // internet: 0,
+    // tv: 0,
+    // groceries: 0,
+    // gas: 0,
+    // dining: 0,
+    // merchandise: 0,
+    // entertainment: 0,
+    // transportation: 0,
+    // personal: 0,
+    // subscriptions: 0,
   });
+
+  const [loaded, setLoaded] = React.useState(false);
+  const [budgetOptions, setBudgetOptions] = React.useState([]);
+
+  React.useEffect(() => {
+    setLoaded(true);
+    getOptions(values.user_id);
+  }, [values])
+
+  //get dropdown options
+  const getOptions = async (user_id) => {
+    const budgetList = await ServerRoutes.getBudgets(user_id);
+    let optionsJSX = [];
+    if (budgetList) {
+      console.log(budgetList);
+      optionsJSX = budgetList.map((budget) => {
+        return (
+          <option key={budget.budget_id} value={budget.budget_id}>{budget.budget_id}</option>
+        )
+      })
+    }
+    setBudgetOptions(optionsJSX);
+  }
+
+  const budgetDropdown = () => {
+    //return select dropdown
+    return (
+      <div>
+        <label style={{ marginRight: '11px' }}>Select Budget</label>
+        <select
+          className={classes.cellSelect}
+          key={`select-budget`}
+          value={values.budget_id}
+          onChange={(e) => { handleSelectChange(e) }}
+        >{budgetOptions}</select>
+      </div>
+    )
+
+  }
+
+  const handleSelectChange = (event) => {
+    // setLoading(true);
+    // if (type === "year") {
+    //   setYear(event.target.value);
+    // }
+    // if (type === "month") {
+    //   setMonth(event.target.value);
+    // }
+  }
+
 
   //
   const sumPercent = (values) => {
@@ -99,19 +209,20 @@ export default function InputAdornments() {
       + values.phone + values.internet + values.tv
       + values.groceries + values.gas + values.dining
       + values.merchandise + values.entertainment + values.subscriptions
-      + values.transportation + values.personal + values.other_monthly;
+      + values.transportation + values.personal;
   }
   const [budget_percent_sum, setPercentSum] = React.useState(sumPercent(values));
   React.useEffect(() => {
-    setPercentSum(sumPercent(values), [])
+    // setPercentSum(sumPercent(values), [])
+    setPercentSum(sumPercent(values));
   }, [values])
 
   //
   const calcAvailIncome = (values) => {
     const yearlyCosts = values.vacation + values.car_expenses
       + values.car_insurance + values.home_insurance
-      + values.property_taxes + values.gifts + values.donations
-      + values.other_yearly;
+      + values.property_taxes + values.gifts + values.donations + values.health
+      + values.other;
     return (values.income - (yearlyCosts / 12));
   }
   const [availableIncome, setAvailIncome] = React.useState(calcAvailIncome(values));
@@ -135,10 +246,10 @@ export default function InputAdornments() {
   }
 
   const handleSubmit = prop => async (event) => {
-    const res = await ServerRoutes.updateSettings({ ...values, user_id: "kinzelj" })
-    if (res > 0) {setPopupMessage("User settings updated.")}
-    else {setPopupMessage("Error: No settings changed or updated.")}
-    dispatch(fetchSettings('kinzelj'));
+    const res = await ServerRoutes.updateSettings(values);
+    if (res > 0) { setPopupMessage("User settings updated.") }
+    else { setPopupMessage("Error: No settings changed or updated.") }
+    dispatch(fetchSettings({ user_id: values.user_id, budget_year: values.budget_year }));
     setShowPopup(true);
   }
 
@@ -147,16 +258,21 @@ export default function InputAdornments() {
   }
 
   if (showPopup) {
-    return (<Popup closePopup={handleClosePopup} type={"settingsOk"} message={popupMessage}/>);
+    return (<Popup closePopup={handleClosePopup} type={"settingsOk"} message={popupMessage} />);
   }
-  else {
+  else if (loaded) {
     return (
       <form className={classes.rootForm} noValidate autoComplete="off">
         <div className={classes.rootDiv}>
-
           <div className={classes.container}>
+            <div className={'ui segment ' + classes.budget_id}>
+              <h4>Budget Name</h4>
+              <div>
+                {budgetDropdown()}
+              </div>
+            </div>
             {/******************************* Monthly Income ******************************************/}
-            <div className={classes.div}>
+            <div className={classes.income}>
               <h4 className={classes.h4}>Income</h4>
               <FormControl className={classes.margin} variant="outlined">
                 <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Monthly Net Income</InputLabel>
@@ -234,7 +350,7 @@ export default function InputAdornments() {
                 <p>{"$" + (availableIncome * (values.internet / 100)).toFixed(2)}</p>
               </FormControl>
               <FormControl className={classes.margin} variant="outlined">
-                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">TV</InputLabel>
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">TV/Cable</InputLabel>
                 <OutlinedInput
                   className={classes.box}
                   defaultValue={values.tv}
@@ -336,7 +452,7 @@ export default function InputAdornments() {
                 />
                 <p>{"$" + (availableIncome * (values.subscriptions / 100)).toFixed(2)}</p>
               </FormControl>
-              <br></br>
+              {/* <br></br>
               <FormControl className={classes.margin} variant="outlined">
                 <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Other</InputLabel>
                 <OutlinedInput
@@ -347,7 +463,7 @@ export default function InputAdornments() {
                   labelWidth={105}
                 />
                 <p>{"$" + (availableIncome * (values.other_monthly / 100)).toFixed(2)}</p>
-              </FormControl>
+              </FormControl> */}
 
               <h5 style={{ marginTop: '5px' }}>Sum of Percentages (Must Equal 100%): %{budget_percent_sum}</h5>
             </div>
@@ -400,7 +516,7 @@ export default function InputAdornments() {
               </FormControl>
               <br></br>
               <FormControl className={classes.margin} variant="outlined">
-                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Vacation</InputLabel>
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Vacation/Trips</InputLabel>
                 <OutlinedInput
                   className={classes.box}
                   defaultValue={values.vacation}
@@ -417,7 +533,7 @@ export default function InputAdornments() {
                   defaultValue={values.gifts}
                   onKeyDown={handleKeyDown('gifts')}
                   startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                  labelWidth={105}
+                  labelWidth={75}
                 />
               </FormControl>
               <br></br>
@@ -433,11 +549,22 @@ export default function InputAdornments() {
               </FormControl>
               <br></br>
               <FormControl className={classes.margin} variant="outlined">
-                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Other Yearly Expenses</InputLabel>
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Health Care</InputLabel>
                 <OutlinedInput
                   className={classes.box}
-                  defaultValue={values.other_yearly}
-                  onKeyDown={handleKeyDown('other_yearly')}
+                  defaultValue={values.health}
+                  onKeyDown={handleKeyDown('health')}
+                  startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                  labelWidth={105}
+                />
+              </FormControl>
+              <br></br>
+              <FormControl className={classes.margin} variant="outlined">
+                <InputLabel className={classes.title} htmlFor="outlined-adornment-amount">Other Expenses</InputLabel>
+                <OutlinedInput
+                  className={classes.box}
+                  defaultValue={values.other}
+                  onKeyDown={handleKeyDown('other')}
                   startAdornment={<InputAdornment position="start">$</InputAdornment>}
                   labelWidth={105}
                 />
@@ -445,7 +572,7 @@ export default function InputAdornments() {
             </div>
           </div>
 
-          <p>**Important** You must hit Tab or Enter after each modification for the change to take effect before you click UPDATE.</p>
+          <p>**Important** If you make a change to a budget setting, you must hit Tab or Enter after each modification for the change to take effect, then click UPDATE to submit.</p>
           <div className={classes.button}>
             <Button
               variant="contained"
@@ -460,5 +587,6 @@ export default function InputAdornments() {
       </form>
     );
   }
+  else { return null }
 }
 

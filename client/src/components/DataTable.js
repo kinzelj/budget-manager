@@ -207,6 +207,8 @@ export default class DataTable extends React.Component {
   //   }
   // }
 
+  maxTableHeight = `${this.props.maxHeight}px`;
+
   render() {
     return (
       <div className='data-table'>
@@ -219,7 +221,7 @@ export default class DataTable extends React.Component {
           </table>
         </div>
         {/* <div className='table-body-div' ref={this.checkScrollRef} > */}
-        <div className='table-body-div' >
+        <div className='table-body-div' style={{maxHeight: this.maxTableHeight}}>
           <table className='table-body' cellPadding="0" cellSpacing="0" border="0">
             <tbody>
               {this.renderTableData(this.props.headers, this.props.data)}
